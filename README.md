@@ -1,6 +1,37 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 🎮 Gamified Learning Platform
 
-## Getting Started
+A vibrant, colorful, and engaging landing page for a Gamified Learning Platform designed for students in Grades 6-12. This modern, playful, and game-inspired platform makes learning fun while maintaining professionalism.
+
+## ✨ Features
+
+### 🎯 Hero Section
+- **Vibrant gradient background** with animated color transitions
+- **Compelling tagline**: "Learning Made Fun, For Every Child, Everywhere"
+- **Floating animations** with cartoon-style icons (books, atoms, calculators, code)
+- **Gamified buttons** with glowing effects and hover animations
+- **Live progress indicator** showing active student count
+
+### 🎮 Interactive Features
+- **STEM Games**: Interactive quizzes, puzzles, and simulations
+- **Multilingual Support**: Odia, Hindi, and English language options
+- **Offline Capability**: Download lessons and sync when online
+- **Teacher Dashboard**: Track student progress and analytics
+
+### 🏆 Gamified Elements
+- **Student Leaderboard** with top performers
+- **Achievement badges** and progress tracking
+- **Animated stars** and floating elements
+- **Glowing buttons** with pulse effects
+- **Card hover animations** with 3D transforms
+
+### 🎨 Design System
+- **Modern gradients** (blue, purple, orange, green)
+- **Responsive design** for desktop and mobile
+- **Gamified UI** with badges, stars, and progress bars
+- **Cartoon-style icons** and illustrations
+- **Student-friendly fonts** and rounded corners
+
+## 🚀 Getting Started
 
 First, run the development server:
 
@@ -14,11 +45,27 @@ pnpm dev
 bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000) with your browser to see the vibrant landing page.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## 🛠️ Tech Stack
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- **Next.js 15** with App Router
+- **React 19** with TypeScript
+- **Tailwind CSS 4** for styling
+- **React Icons** for gamified icons
+- **Custom CSS animations** for floating and glowing effects
+
+## 🎨 Custom Animations
+
+The platform includes several custom CSS animations:
+- `gradientShift`: Animated gradient backgrounds
+- `floating`: Floating animation for icons
+- `pulseGlow`: Pulsing glow effects for buttons
+- `card-hover`: 3D hover effects for feature cards
+
+## 🌍 Government of Odisha Branding
+
+The platform features official Government of Odisha branding and partner school logos, designed for the Department of School Education.
 
 ## Learn More
 

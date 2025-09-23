@@ -1,0 +1,61 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String   @id @default(cuid())
+  firebaseUid   String   @unique  // Firebase UID from authentication
+  phone         String   @unique
+  isVerified    Boolean  @default(true)  // Firebase handles verification
+  
+  // Student profile information (collected after Firebase OTP verification)
+  fullName      String?
+  email         String?  @unique
+  dateOfBirth   DateTime?
+  gender        String?
+  
+  // School and academic information
+  schoolName    String?
+  className     String?  // Class/Grade (e.g., "Class 6", "Grade 10")
+  
+  // Address information
+  address       String?
+  city          String?
+  state         String?
+  pincode       String?
+  
+  // Parent/Guardian information
+  fatherName    String?
+  motherName    String?
+  
+  // Profile completion status
+  isProfileComplete Boolean @default(false)
+  
+  // Timestamps
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  lastLoginAt   DateTime?
+  
+  // Sessions
+  sessions      UserSession[]
+    
+  @@map("users")
+}
+
+model UserSession {
+  id            String   @id @default(cuid())
+  userId        String
+  firebaseToken String   @unique
+  expiresAt     DateTime
+  isActive      Boolean  @default(true)
+  createdAt     DateTime @default(now())
+  
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@map("user_sessions")
+}
