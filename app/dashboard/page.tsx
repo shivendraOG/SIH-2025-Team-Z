@@ -1,5 +1,79 @@
 "use client";
-import React, { useEffect, useState } from "react";
+
+import React, { useState, useEffect } from "react";
+import booksDataRaw from "@/data/books.json"; // Adjust the path as necessary
+
+interface Book {
+  class: string;
+  subject: string;
+  title: string;
+  chapters: { chapter: string; url: string }[];
+}
+
+const booksData: Book[] = booksDataRaw as Book[];
+
+function BooksSection({ userClass }: { userClass: string }) {
+  // Normalize class values for comparison (e.g., '6', 'Class 6', 6, etc)
+  function normalizeClass(val: string) {
+    if (!val) return "";
+    // Extract first number found, or fallback to trimmed string
+    const match = val.match(/\d+/);
+    return match ? match[0] : val.trim().toLowerCase();
+  }
+  const userClassNorm = normalizeClass(userClass);
+  const filteredBooks = Array.isArray(booksData)
+    ? booksData.filter((book: Book) => normalizeClass(book.class) === userClassNorm)
+    : [];
+
+  if (!userClassNorm) {
+    return (
+      <div className="text-gray-300">Please complete your profile to see books for your class.</div>
+    );
+  }
+  if (filteredBooks.length === 0) {
+    return (
+      <div className="text-gray-300">No books found for your class.</div>
+    );
+  }
+  return (
+    <div className="space-y-3">
+      {filteredBooks.map((book) => (
+        <div
+          key={book.subject}
+          className="bg-green-600/20 border border-green-200/30 rounded-lg p-4 hover:bg-green-600/30 transition cursor-pointer shadow"
+        >
+          <div className="flex items-center gap-3">
+            <span className="text-2xl">📖</span>
+            <div>
+              <div className="font-semibold text-white">{book.title} ({book.subject})</div>
+              <div className="text-sm text-gray-300">
+                {book.chapters && book.chapters.length > 0 ? (
+                  <ul className="list-disc ml-5 mt-2 space-y-2">
+                    {book.chapters.map((ch) => (
+                      <li key={ch.chapter}>
+                        <a
+                          href={ch.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-block px-3 py-1 rounded-full text-sm text-cyan-400 bg-cyan-800/30 hover:bg-cyan-700/50 transition-colors"
+                        >
+                          {ch.chapter}
+                        </a>
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  <span>No chapters available.</span>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
 
 // Utility function for greeting
 function getGreeting() {
@@ -193,59 +267,59 @@ export default function Dashboard() {
   }, []);
 
   function capitalizeFullName(name: string) {
-  return name
-    .split(" ")
-    .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
-    .join(" ");
-}
-
-useEffect(() => {
-  async function fetchProfile() {
-    setLoadingProfile(true);
-    setProfileError("");
-    try {
-      const token = localStorage.getItem("firebaseToken");
-      if (!token) {
-        setProfileError("Not logged in. Please login.");
-        setLoadingProfile(false);
-        return;
-      }
-
-      const res = await fetch("/api/users/profile", {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      const data = await res.json();
-
-      if (!res.ok || !data.success) {
-        setProfileError(`Failed to fetch profile. ${data.message || "Please try again."}`);
-      } else {
-        const user = data.user;
-        if (user) {
-          setProfile({
-            fullName: capitalizeFullName(user.fullName || ""),
-            className: user.className || "",
-            dateOfBirth: user.dateOfBirth || "",
-            schoolName: user.schoolName || "",
-          });
-          setXp(user.xp ?? xp);
-        } else {
-          setProfileError("No profile data found.");
-        }
-      }
-    } catch (err) {
-      setProfileError("Error fetching profile. Please check your connection.");
-      console.error("Failed to fetch profile", err);
-    } finally {
-      setLoadingProfile(false);
-    }
+    return name
+      .split(" ")
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+      .join(" ");
   }
-  fetchProfile();
-}, []);
+
+  useEffect(() => {
+    async function fetchProfile() {
+      setLoadingProfile(true);
+      setProfileError("");
+      try {
+        const token = localStorage.getItem("firebaseToken");
+        if (!token) {
+          setProfileError("Not logged in. Please login.");
+          setLoadingProfile(false);
+          return;
+        }
+
+        const res = await fetch("/api/users/profile", {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        const data = await res.json();
+
+        if (!res.ok || !data.success) {
+          setProfileError(`Failed to fetch profile. ${data.message || "Please try again."}`);
+        } else {
+          const user = data.user;
+          if (user) {
+            setProfile({
+              fullName: capitalizeFullName(user.fullName || ""),
+              className: user.className || "",
+              dateOfBirth: user.dateOfBirth || "",
+              schoolName: user.schoolName || "",
+            });
+            setXp(user.xp ?? xp);
+          } else {
+            setProfileError("No profile data found.");
+          }
+        }
+      } catch (err) {
+        setProfileError("Error fetching profile. Please check your connection.");
+        console.error("Failed to fetch profile", err);
+      } finally {
+        setLoadingProfile(false);
+      }
+    }
+    fetchProfile();
+  }, []);
 
 
 
@@ -373,9 +447,8 @@ useEffect(() => {
             {loadingProfile
               ? "Loading..."
               : profileError
-              ? profileError
-              : `${greeting}${
-                  profile.fullName ? ", " + profile.fullName + " 👋" : ""
+                ? profileError
+                : `${greeting}${profile.fullName ? ", " + profile.fullName + " 👋" : ""
                 }`}
           </h1>
 
@@ -439,42 +512,42 @@ useEffect(() => {
         </div>
       </header>
 
-    {/* Live Class Banner */}
-<section className="rounded-3xl bg-gradient-to-br from-purple-700 via-teal-700 to-blue-800 p-8 mx-4 mt-6 shadow-2xl border border-purple-600/40 flex flex-col md:flex-row justify-between items-center relative overflow-hidden">
-  {/* Decorative Curve or Shape */}
-  <div className="absolute inset-0 bg-gradient-to-r from-pink-500 via-red-500 to-yellow-500 opacity-40 blur-xl transform rotate-12 -z-10"></div>
+      {/* Live Class Banner */}
+      <section className="rounded-3xl bg-gradient-to-br from-purple-700 via-teal-700 to-blue-800 p-8 mx-4 mt-6 shadow-2xl border border-purple-600/40 flex flex-col md:flex-row justify-between items-center relative overflow-hidden">
+        {/* Decorative Curve or Shape */}
+        <div className="absolute inset-0 bg-gradient-to-r from-pink-500 via-red-500 to-yellow-500 opacity-40 blur-xl transform rotate-12 -z-10"></div>
 
-  <div className="space-y-4">
-    {/* Greeting */}
-    <div className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-orange-400 to-yellow-500 drop-shadow-2xl">
-      {greeting}, {profile.fullName || "Student"}! 🌟
-    </div>
+        <div className="space-y-4">
+          {/* Greeting */}
+          <div className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-orange-400 to-yellow-500 drop-shadow-2xl">
+            {greeting}, {profile.fullName || "Student"}! 🌟
+          </div>
 
-    {/* Class Information */}
-    <div className="text-lg text-gray-200 flex flex-col md:flex-row items-start md:items-center gap-6 md:gap-3">
-      <span className="text-4xl animate-bounce">🎉</span>
-      <span className="text-xl md:text-2xl font-medium">New science live class today at 4:00PM!</span>
+          {/* Class Information */}
+          <div className="text-lg text-gray-200 flex flex-col md:flex-row items-start md:items-center gap-6 md:gap-3">
+            <span className="text-4xl animate-bounce">🎉</span>
+            <span className="text-xl md:text-2xl font-medium">New science live class today at 4:00PM!</span>
 
-      {/* Button */}
-      <button
-        className="ml-3 px-6 py-3 text-sm rounded-2xl bg-gradient-to-r from-teal-500 to-cyan-500 text-white font-semibold shadow-2xl hover:from-teal-600 hover:to-cyan-600 transition duration-300 transform hover:scale-105"
-        aria-label="Join live class"
-      >
-        Join Now
-      </button>
-    </div>
-  </div>
+            {/* Button */}
+            <button
+              className="ml-3 px-6 py-3 text-sm rounded-2xl bg-gradient-to-r from-teal-500 to-cyan-500 text-white font-semibold shadow-2xl hover:from-teal-600 hover:to-cyan-600 transition duration-300 transform hover:scale-105"
+              aria-label="Join live class"
+            >
+              Join Now
+            </button>
+          </div>
+        </div>
 
-  {/* Mascot Image */}
-  <div className="mt-6 md:mt-0 relative">
-    <img
-      src="/friendly-mascot-robot.jpg"
-      alt="Mascot"
-      className="w-24 h-24 md:w-32 md:h-32 select-none drop-shadow-xl hover:rotate-12 transition-transform duration-300 ease-in-out"
-      loading="lazy"
-    />
-  </div>
-</section>
+        {/* Mascot Image */}
+        <div className="mt-6 md:mt-0 relative">
+          <img
+            src="/friendly-mascot-robot.jpg"
+            alt="Mascot"
+            className="w-24 h-24 md:w-32 md:h-32 select-none drop-shadow-xl hover:rotate-12 transition-transform duration-300 ease-in-out"
+            loading="lazy"
+          />
+        </div>
+      </section>
 
 
       {/* Action Buttons */}
@@ -527,29 +600,9 @@ useEffect(() => {
           icon="📚"
           title="Books & Reading"
         >
-          <div className="space-y-3">
-            <div className="bg-green-600/20 border border-green-200/30 rounded-lg p-4 hover:bg-green-600/30 transition cursor-pointer shadow">
-              <div className="flex items-center gap-3">
-                <span className="text-2xl">📖</span>
-                <div>
-                  <div className="font-semibold text-white">
-                    Science Textbook
-                  </div>
-                  <div className="text-sm text-gray-300">Chapter 5: Forces</div>
-                </div>
-              </div>
-            </div>
-            <div className="bg-blue-600/20 border border-blue-200/30 rounded-lg p-4 hover:bg-blue-600/30 transition cursor-pointer shadow">
-              <div className="flex items-center gap-3">
-                <span className="text-2xl">📚</span>
-                <div>
-                  <div className="font-semibold text-white">Math Workbook</div>
-                  <div className="text-sm text-gray-300">Algebra Practice</div>
-                </div>
-              </div>
-            </div>
-          </div>
+          <BooksSection userClass={profile.className} />
         </SectionCard>
+
 
         {/* Notes & Study */}
         <SectionCard

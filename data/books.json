@@ -1,0 +1,51 @@
+[
+  {
+    "class": "6",
+    "subject": "Math",
+    "title": "Mathematics",
+    "chapters": [
+      {
+        "chapter": "Chapter 1 – Knowing Our Numbers",
+        "url": "https://firebasestorage.googleapis.com/v0/b/sih25048-c4ebd.firebasestorage.app/o/math6ch1.pdf?alt=media&token=3845fa95-5de5-4cf9-b477-736a92c218f3"
+      },
+      {
+        "chapter": "Chapter 2 – Whole Numbers",
+        "url": "https://firebasestorage.googleapis.com/v0/b/sih25048-c4ebd.firebasestorage.app/o/math6ch2.pdf?alt=media&token=565696ec-9289-4ea7-a179-6f6577d7cf79"
+      },
+      {
+        "chapter": "Chapter 3 – Playing with Numbers",
+        "url": "https://firebasestorage.googleapis.com/v0/b/sih25048-c4ebd.firebasestorage.app/o/math6ch3.pdf?alt=media&token=6f6577d7cf79"
+      }
+    ]
+  },
+  {
+    "class": "6",
+    "subject": "Science",
+    "title": "Science",
+    "chapters": [
+      {
+        "chapter": "Chapter 1 – Food: Where Does It Come From?",
+        "url": "https://ncert.nic.in/textbook/pdf/gesc101.pdf"
+      },
+      {
+        "chapter": "Chapter 2 – Components of Food",
+        "url": "https://ncert.nic.in/textbook/pdf/gesc102.pdf"
+      }
+    ]
+  },
+  {
+    "class": "6",
+    "subject": "English",
+    "title": "Honeysuckle",
+    "chapters": [
+      {
+        "chapter": "Chapter 1 – Who Did Patrick's Homework?",
+        "url": "https://ncert.nic.in/textbook/pdf/felh101.pdf"
+      },
+      {
+        "chapter": "Chapter 2 – How the Dog Found Himself a New Master!",
+        "url": "https://ncert.nic.in/textbook/pdf/felh102.pdf"
+      }
+    ]
+  }
+]
