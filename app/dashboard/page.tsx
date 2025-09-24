@@ -34,6 +34,9 @@ import {
   LogOut,
   Menu,
   X,
+  Atom,
+  Waves,
+  Thermometer,
 } from "lucide-react";
 
 // Extend Window type to include firebase
@@ -688,8 +691,80 @@ function DashboardContent() {
       </header>
 
       <section className="bg-white/60 backdrop-blur-sm border-b border-gray-200/50">
-        <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-6">
-          <TodoList />
+        <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-6 grid grid-cols-1 md:grid-cols-2 gap-6 items-stretch">
+          {/* Virtual Lab Preview Card */}
+          <div className="flex flex-col h-full">
+            <Card className="flex-1 flex flex-col bg-white/80 backdrop-blur-sm border-0 shadow-lg">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-gray-900 text-lg sm:text-xl">
+                  <FlaskConical className="h-5 w-5 text-blue-600" />
+                  Virtual Lab
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="flex flex-col gap-4">
+                {/* Show a few virtual lab cards inline, responsive */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  {/* Chemistry Simulation */}
+                  <div className="rounded-xl border bg-gradient-to-br from-blue-50 to-purple-50 p-3 flex flex-col gap-1 shadow-sm">
+                    <div className="flex items-center gap-2 mb-1">
+                      <Atom className="h-5 w-5 text-blue-500" />
+                      <span className="font-semibold text-gray-800 text-sm">Chemistry Simulation</span>
+                    </div>
+                    <div className="text-xs text-gray-600 mb-1">Balancing Chemical Equations</div>
+                    <div className="text-xs text-gray-500 mb-2">Learn to balance chemical equations through interactive simulations.</div>
+                    <Button size="sm" className="w-fit px-3 py-1 text-xs bg-blue-500 hover:bg-blue-600 text-white" onClick={() => window.open('https://phet.colorado.edu/sims/html/balancing-chemical-equations/latest/balancing-chemical-equations_en.html', '_blank')}>Try Now</Button>
+                  </div>
+                  {/* Circuit Construction */}
+                  <div className="rounded-xl border bg-gradient-to-br from-yellow-50 to-orange-50 p-3 flex flex-col gap-1 shadow-sm">
+                    <div className="flex items-center gap-2 mb-1">
+                      <Zap className="h-5 w-5 text-yellow-500" />
+                      <span className="font-semibold text-gray-800 text-sm">Circuit Construction</span>
+                    </div>
+                    <div className="text-xs text-gray-600 mb-1">DC Circuit Builder</div>
+                    <div className="text-xs text-gray-500 mb-2">Build and test electrical circuits with batteries, resistors, and wires.</div>
+                    <Button size="sm" className="w-fit px-3 py-1 text-xs bg-yellow-500 hover:bg-yellow-600 text-white" onClick={() => window.open('https://phet.colorado.edu/sims/html/circuit-construction-kit-dc/latest/circuit-construction-kit-dc_en.html', '_blank')}>Try Now</Button>
+                  </div>
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  {/* Wave Interference */}
+                  <div className="rounded-xl border bg-gradient-to-br from-cyan-50 to-blue-50 p-3 flex flex-col gap-1 shadow-sm">
+                    <div className="flex items-center gap-2 mb-1">
+                      <Waves className="h-5 w-5 text-cyan-500" />
+                      <span className="font-semibold text-gray-800 text-sm">Wave Interference</span>
+                    </div>
+                    <div className="text-xs text-gray-600 mb-1">Sound & Light Waves</div>
+                    <div className="text-xs text-gray-500 mb-2">Explore wave behavior, interference patterns, and wave properties.</div>
+                    <Button size="sm" className="w-fit px-3 py-1 text-xs bg-cyan-500 hover:bg-cyan-600 text-white" onClick={() => window.open('https://phet.colorado.edu/sims/html/wave-interference/latest/wave-interference_en.html', '_blank')}>Try Now</Button>
+                  </div>
+                  {/* States of Matter */}
+                  <div className="rounded-xl border bg-gradient-to-br from-red-50 to-pink-50 p-3 flex flex-col gap-1 shadow-sm">
+                    <div className="flex items-center gap-2 mb-1">
+                      <Thermometer className="h-5 w-5 text-red-500" />
+                      <span className="font-semibold text-gray-800 text-sm">States of Matter</span>
+                    </div>
+                    <div className="text-xs text-gray-600 mb-1">Phase Changes & Temperature</div>
+                    <div className="text-xs text-gray-500 mb-2">Investigate how temperature affects the states of matter.</div>
+                    <Button size="sm" className="w-fit px-3 py-1 text-xs bg-red-500 hover:bg-pink-600 text-white" onClick={() => window.open('https://phet.colorado.edu/sims/html/states-of-matter/latest/states-of-matter_en.html', '_blank')}>Try Now</Button>
+                  </div>
+                </div>
+                <Button variant="outline" className="mt-2 self-end text-blue-600 border-blue-300 hover:bg-blue-50" onClick={() => window.open('/virtual-lab', '_self')}>See More</Button>
+              </CardContent>
+            </Card>
+          </div>
+          {/* Todo List Card */}
+          <div className="flex flex-col h-full">
+            <Card className="flex-1 flex flex-col bg-white/80 backdrop-blur-sm border-0 shadow-lg">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-gray-900 text-lg sm:text-xl">
+                  <CheckCircle className="h-5 w-5 text-green-600" />
+                  Todo List
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="flex-1 overflow-y-auto">
+                <TodoList />
+              </CardContent>
+            </Card>
+          </div>
         </div>
       </section>
 
