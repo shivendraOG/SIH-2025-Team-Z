@@ -580,8 +580,9 @@ function DashboardContent() {
                     variant="ghost"
                     className="relative h-8 w-8 rounded-full p-0"
                   >
+                   
                     <img
-                      src="/student-avatar.png"
+                      src="/avatar.jpg"
                       alt="Profile"
                       className="w-8 h-8 rounded-full border-2 border-gray-200 hover:border-gray-300 transition-colors"
                     />
