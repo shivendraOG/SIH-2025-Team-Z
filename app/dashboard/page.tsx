@@ -1,7 +1,9 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import booksDataRaw from "@/data/books.json"; // Adjust the path as necessary
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { BookOpen, Play, Star, Clock, CheckCircle } from "lucide-react";
+import booksDataRaw from "@/data/books.json";
 
 interface Book {
   class: string;
@@ -12,68 +14,304 @@ interface Book {
 
 const booksData: Book[] = booksDataRaw as Book[];
 
+// Add mock data for the new UI to work properly
+const newBooksData = booksData.map((book) => ({
+  ...book,
+  chapters: book.chapters.map((ch, index) => ({
+    ...ch,
+    completed: index % 2 === 0, // Mocking completion status
+    duration: `${Math.floor(Math.random() * 30) + 30} min`, // Mocking duration
+  })),
+}));
+
+const subjectColors: { [key: string]: { gradient: string; accent: string; icon: string } } = {
+  Mathematics: {
+    gradient: "from-blue-600 via-blue-700 to-indigo-800",
+    accent: "from-blue-400 to-indigo-500",
+    icon: "🧮",
+  },
+  Physics: {
+    gradient: "from-purple-600 via-purple-700 to-violet-800",
+    accent: "from-purple-400 to-violet-500",
+    icon: "⚛️",
+  },
+  Chemistry: {
+    gradient: "from-emerald-600 via-emerald-700 to-teal-800",
+    accent: "from-emerald-400 to-teal-500",
+    icon: "🧪",
+  },
+  Biology: {
+    gradient: "from-teal-600 via-teal-700 to-cyan-800",
+    accent: "from-teal-400 to-cyan-500",
+    icon: "🧬",
+  },
+  English: {
+    gradient: "from-orange-600 via-orange-700 to-red-800",
+    accent: "from-orange-400 to-red-500",
+    icon: "📝",
+  },
+  History: {
+    gradient: "from-amber-600 via-amber-700 to-yellow-800",
+    accent: "from-amber-400 to-yellow-500",
+    icon: "🏛️",
+  },
+  Geography: {
+    gradient: "from-pink-600 via-pink-700 to-rose-800",
+    accent: "from-pink-400 to-rose-500",
+    icon: "🌍",
+  },
+};
+
 function BooksSection({ userClass }: { userClass: string }) {
-  // Normalize class values for comparison (e.g., '6', 'Class 6', 6, etc)
   function normalizeClass(val: string) {
     if (!val) return "";
-    // Extract first number found, or fallback to trimmed string
     const match = val.match(/\d+/);
     return match ? match[0] : val.trim().toLowerCase();
   }
+
   const userClassNorm = normalizeClass(userClass);
-  const filteredBooks = Array.isArray(booksData)
-    ? booksData.filter((book: Book) => normalizeClass(book.class) === userClassNorm)
+  const filteredBooks = Array.isArray(newBooksData)
+    ? newBooksData.filter((book) => normalizeClass(book.class) === userClassNorm)
     : [];
+
+  const getCompletionStats = (book: any) => {
+    const completed = book.chapters.filter((ch: any) => ch.completed).length;
+    const total = book.chapters.length;
+    const percentage = total > 0 ? Math.round((completed / total) * 100) : 0;
+    return { completed, total, percentage };
+  };
 
   if (!userClassNorm) {
     return (
-      <div className="text-gray-300">Please complete your profile to see books for your class.</div>
+      <Card className="bg-gradient-to-br from-slate-900 to-slate-800 border-slate-700 overflow-hidden">
+        <CardContent className="flex items-center justify-center py-16">
+          <div className="text-center">
+            <div className="w-24 h-24 bg-gradient-to-br from-blue-500 to-purple-600 rounded-3xl flex items-center justify-center mb-6 mx-auto">
+              <BookOpen className="w-12 h-12 text-white" />
+            </div>
+            <h3 className="text-xl font-semibold text-white mb-2">Complete Your Profile</h3>
+            <p className="text-slate-400 max-w-sm">
+              Please complete your profile to see personalized books for your class.
+            </p>
+          </div>
+        </CardContent>
+      </Card>
     );
   }
+
   if (filteredBooks.length === 0) {
     return (
-      <div className="text-gray-300">No books found for your class.</div>
+      <Card className="bg-gradient-to-br from-slate-900 to-slate-800 border-slate-700 overflow-hidden">
+        <CardContent className="flex items-center justify-center py-16">
+          <div className="text-center">
+            <div className="w-24 h-24 bg-gradient-to-br from-orange-500 to-red-600 rounded-3xl flex items-center justify-center mb-6 mx-auto">
+              <BookOpen className="w-12 h-12 text-white" />
+            </div>
+            <h3 className="text-xl font-semibold text-white mb-2">No Books Available</h3>
+            <p className="text-slate-400 max-w-sm">
+              No books found for Class {userClass}. Check back later for updates.
+            </p>
+          </div>
+        </CardContent>
+      </Card>
     );
   }
+
   return (
-    <div className="space-y-3">
-      {filteredBooks.map((book) => (
-        <div
-          key={book.subject}
-          className="bg-green-600/20 border border-green-200/30 rounded-lg p-4 hover:bg-green-600/30 transition cursor-pointer shadow"
-        >
-          <div className="flex items-center gap-3">
-            <span className="text-2xl">📖</span>
-            <div>
-              <div className="font-semibold text-white">{book.title} ({book.subject})</div>
-              <div className="text-sm text-gray-300">
+    <div className="space-y-8">
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-4">
+          <div className="w-16 h-16 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-3xl flex items-center justify-center shadow-lg">
+            <BookOpen className="w-8 h-8 text-white" />
+          </div>
+          <div>
+            <h2 className="text-3xl font-bold text-white mb-1">Your Library</h2>
+            <p className="text-slate-400 text-lg">
+              Class {userClass} • {filteredBooks.length} subjects available
+            </p>
+          </div>
+        </div>
+        <div className="text-right">
+          <div className="text-2xl font-bold text-emerald-400">
+            {Math.round(
+              filteredBooks.reduce((acc, book) => acc + getCompletionStats(book).percentage, 0) /
+                (filteredBooks.length || 1)
+            )}
+            %
+          </div>
+          <div className="text-slate-400 text-sm">Overall Progress</div>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-8">
+        {filteredBooks.map((book, index) => {
+          const colors = subjectColors[book.subject] || subjectColors.Mathematics;
+          const stats = getCompletionStats(book);
+
+          return (
+            <Card
+              key={book.subject}
+              className={`bg-gradient-to-br ${colors.gradient} border-0 text-white hover:scale-[1.02] transition-all duration-500 shadow-2xl hover:shadow-3xl cursor-pointer group overflow-hidden relative`}
+            >
+              <div className="absolute top-0 right-0 w-40 h-40 bg-white/5 rounded-full -translate-y-20 translate-x-20 group-hover:scale-125 transition-transform duration-700"></div>
+              <div className="absolute bottom-0 left-0 w-32 h-32 bg-white/10 rounded-full translate-y-16 -translate-x-16 group-hover:scale-110 transition-transform duration-700"></div>
+              <div className="absolute top-1/2 left-1/2 w-24 h-24 bg-white/5 rounded-full -translate-x-12 -translate-y-12 group-hover:rotate-45 transition-transform duration-1000"></div>
+
+              <CardHeader className="relative z-10 pb-4">
+                <div className="flex items-start justify-between mb-6">
+                  <div className="flex items-center gap-4">
+                    <div
+                      className={`w-20 h-20 bg-gradient-to-br ${colors.accent} rounded-3xl flex items-center justify-center text-4xl shadow-lg group-hover:scale-110 transition-transform duration-300 border-2 border-white/20`}
+                    >
+                      {colors.icon}
+                    </div>
+                    <div>
+                      <CardTitle className="text-2xl font-bold text-white mb-2 group-hover:text-yellow-200 transition-colors duration-300">
+                        {book.subject}
+                      </CardTitle>
+                      <p className="text-white/80 text-sm font-medium">{book.title}</p>
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <div className="flex items-center gap-1 mb-1">
+                      <Star className="w-4 h-4 text-yellow-400 fill-current" />
+                      <span className="text-yellow-400 font-semibold">4.8</span>
+                    </div>
+                    <div className="text-white/60 text-xs">Rating</div>
+                  </div>
+                </div>
+
+                <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-4 border border-white/20">
+                  <div className="flex items-center justify-between mb-3">
+                    <span className="text-white/90 font-medium">Progress</span>
+                    <span className="text-white font-bold">{stats.percentage}%</span>
+                  </div>
+                  <div className="w-full bg-white/20 rounded-full h-3 overflow-hidden">
+                    <div
+                      className={`h-full bg-gradient-to-r ${colors.accent} rounded-full transition-all duration-1000 ease-out`}
+                      style={{ width: `${stats.percentage}%` }}
+                    ></div>
+                  </div>
+                  <div className="flex items-center justify-between mt-2 text-xs text-white/70">
+                    <span>
+                      {stats.completed} of {stats.total} chapters
+                    </span>
+                    <span>{stats.total - stats.completed} remaining</span>
+                  </div>
+                </div>
+              </CardHeader>
+
+              <CardContent className="relative z-10 pt-0">
                 {book.chapters && book.chapters.length > 0 ? (
-                  <ul className="list-disc ml-5 mt-2 space-y-2">
-                    {book.chapters.map((ch) => (
-                      <li key={ch.chapter}>
+                  <div className="space-y-3 mb-6">
+                    <h4 className="text-white/90 font-semibold mb-4 flex items-center gap-2">
+                      <BookOpen className="w-4 h-4" />
+                      Chapters ({book.chapters.length})
+                    </h4>
+                    <div className="space-y-2 max-h-48 overflow-y-auto custom-scrollbar">
+                      {book.chapters.map((chapter, chapterIndex) => (
                         <a
-                          href={ch.url}
+                          key={chapterIndex}
+                          href={chapter.url}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="inline-block px-3 py-1 rounded-full text-sm text-cyan-400 bg-cyan-800/30 hover:bg-cyan-700/50 transition-colors"
+                          className="flex items-center gap-4 p-4 bg-white/10 backdrop-blur-sm rounded-xl hover:bg-white/20 transition-all duration-300 group/chapter border border-white/20 hover:border-white/40"
                         >
-                          {ch.chapter}
+                          <div
+                            className={`w-10 h-10 rounded-xl flex items-center justify-center text-sm font-bold transition-all duration-300 ${
+                              (chapter as any).completed
+                                ? "bg-emerald-500/20 text-emerald-300 border-2 border-emerald-400/50"
+                                : "bg-white/20 text-white group-hover/chapter:bg-white/30"
+                            }`}
+                          >
+                            {(chapter as any).completed ? <CheckCircle className="w-5 h-5" /> : chapterIndex + 1}
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <div
+                              className={`font-medium transition-colors duration-300 line-clamp-1 ${
+                                (chapter as any).completed
+                                  ? "text-emerald-300"
+                                  : "text-white group-hover/chapter:text-yellow-200"
+                              }`}
+                            >
+                              {chapter.chapter}
+                            </div>
+                            <div className="flex items-center gap-2 mt-1">
+                              <Clock className="w-3 h-3 text-white/50" />
+                              <span className="text-white/60 text-xs">{(chapter as any).duration}</span>
+                              {(chapter as any).completed && (
+                                <span className="text-emerald-400 text-xs font-medium">✓ Completed</span>
+                              )}
+                            </div>
+                          </div>
+                          <div className="text-white/60 group-hover/chapter:text-white/80 transition-colors duration-300">
+                            <Play className="w-4 h-4" />
+                          </div>
                         </a>
-                      </li>
-                    ))}
-                  </ul>
+                      ))}
+                    </div>
+                  </div>
                 ) : (
-                  <span>No chapters available.</span>
+                  <div className="text-center py-12">
+                    <div className="w-16 h-16 bg-white/10 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                      <BookOpen className="w-8 h-8 text-white/50" />
+                    </div>
+                    <span className="text-white/60">No chapters available</span>
+                  </div>
                 )}
+
+                <button
+                  className={`w-full px-6 py-4 bg-gradient-to-r ${colors.accent} backdrop-blur-sm rounded-2xl text-white font-semibold hover:scale-[1.02] transition-all duration-300 flex items-center justify-center gap-3 group/button shadow-lg border border-white/20 hover:border-white/40`}
+                >
+                  <BookOpen className="w-5 h-5 group-hover/button:scale-110 transition-transform duration-300" />
+                  <span className="group-hover/button:text-yellow-100 transition-colors duration-300">
+                    Continue Reading
+                  </span>
+                  <Play className="w-4 h-4 group-hover/button:translate-x-1 transition-transform duration-300" />
+                </button>
+              </CardContent>
+            </Card>
+          );
+        })}
+      </div>
+
+      <Card className="bg-gradient-to-r from-slate-900/80 to-slate-800/80 border-slate-700/50 backdrop-blur-xl overflow-hidden relative">
+        <div className="absolute inset-0 bg-gradient-to-r from-indigo-500/10 to-purple-500/10"></div>
+        <CardContent className="py-8 relative z-10">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-6">
+              <div className="w-16 h-16 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-3xl flex items-center justify-center shadow-lg">
+                <Star className="w-8 h-8 text-white fill-current" />
+              </div>
+              <div>
+                <h3 className="text-2xl font-bold text-white mb-1">Learning Journey</h3>
+                <p className="text-slate-300">Track your progress across all subjects</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-8">
+              <div className="text-center">
+                <div className="text-3xl font-bold text-emerald-400 mb-1">
+                  {filteredBooks.reduce((acc, book) => acc + getCompletionStats(book).completed, 0)}
+                </div>
+                <div className="text-slate-400 text-sm">Chapters Done</div>
+              </div>
+              <div className="text-center">
+                <div className="text-3xl font-bold text-blue-400 mb-1">
+                  {filteredBooks.reduce((acc, book) => acc + book.chapters.length, 0)}
+                </div>
+                <div className="text-slate-400 text-sm">Total Chapters</div>
+              </div>
+              <div className="text-center">
+                <div className="text-3xl font-bold text-purple-400 mb-1">{filteredBooks.length}</div>
+                <div className="text-slate-400 text-sm">Active Subjects</div>
               </div>
             </div>
           </div>
-        </div>
-      ))}
+        </CardContent>
+      </Card>
     </div>
   );
 }
-
 
 // Utility function for greeting
 function getGreeting() {
