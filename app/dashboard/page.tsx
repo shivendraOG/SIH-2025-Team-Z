@@ -43,7 +43,11 @@ declare global {
   }
 }
 import booksDataRaw from "@/data/books.json"
+
 import TodoList from "@/components/TodoList"
+import { useContext } from "react"
+// Assuming you will create this context in context/TodoContext.tsx
+import { TodoContext, TodoProvider } from "@/context/TodoContext"
 
 interface Book {
   class: string
@@ -311,7 +315,7 @@ function WordMiniGame({ onComplete }: { onComplete: (xp: number) => void }) {
   )
 }
 
-export default function Dashboard() {
+function DashboardContent() {
   const [xp, setXp] = useState(850)
   const [greeting, setGreeting] = useState(getGreeting())
   const [xpProgress, setXpProgress] = useState(0)
@@ -749,18 +753,36 @@ export default function Dashboard() {
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-2 sm:space-y-3">
-                <div className="flex items-center gap-2 sm:gap-3 p-2 sm:p-3 rounded-lg bg-green-50 border border-green-200">
-                  <CheckCircle className="h-4 w-4 sm:h-5 sm:w-5 text-green-600 flex-shrink-0" />
-                  <span className="text-xs sm:text-sm font-medium text-green-800">Complete Science Quiz 4</span>
-                </div>
-                <div className="flex items-center gap-2 sm:gap-3 p-2 sm:p-3 rounded-lg bg-blue-50 border border-blue-200">
-                  <Clock className="h-4 w-4 sm:h-5 sm:w-5 text-blue-600 flex-shrink-0" />
-                  <span className="text-xs sm:text-sm font-medium text-blue-800">Read English Chapter 3</span>
-                </div>
-                <div className="flex items-center gap-2 sm:gap-3 p-2 sm:p-3 rounded-lg bg-purple-50 border border-purple-200">
-                  <Video className="h-4 w-4 sm:h-5 sm:w-5 text-purple-600 flex-shrink-0" />
-                  <span className="text-xs sm:text-sm font-medium text-purple-800">Watch: Fractions in Maths</span>
-                </div>
+                {/** Get tasks from TodoContext */}
+                {(() => {
+                  const { tasks } = useContext(TodoContext) || { tasks: [] }
+                  if (!tasks || tasks.length === 0) {
+                    return (
+                      <div className="text-gray-500 text-sm">No tasks for today! 🎉</div>
+                    )
+                  }
+                  return tasks.map((task: any, idx: number) => {
+                    // Color/icon logic based on task type or index
+                    let bg = "bg-green-50 border-green-200 text-green-800"
+                    let Icon = CheckCircle
+                    if (task.type === "reading" || idx % 3 === 1) {
+                      bg = "bg-blue-50 border-blue-200 text-blue-800"
+                      Icon = Clock
+                    } else if (task.type === "video" || idx % 3 === 2) {
+                      bg = "bg-purple-50 border-purple-200 text-purple-800"
+                      Icon = Video
+                    }
+                    return (
+                      <div
+                        key={task.id || idx}
+                        className={`flex items-center gap-2 sm:gap-3 p-2 sm:p-3 rounded-lg border ${bg}`}
+                      >
+                        <Icon className={`h-4 w-4 sm:h-5 sm:w-5 flex-shrink-0 ${bg.split(" ").pop()}`} />
+                        <span className={`text-xs sm:text-sm font-medium ${bg.split(" ").pop()}`}>{task.text || task.title}</span>
+                      </div>
+                    )
+                  })
+                })()}
               </CardContent>
             </Card>
 
@@ -852,5 +874,13 @@ export default function Dashboard() {
         </div>
       )}
     </div>
+  )
+}
+
+export default function Dashboard() {
+  return (
+    <TodoProvider>
+      <DashboardContent />
+    </TodoProvider>
   )
 }
