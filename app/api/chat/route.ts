@@ -16,6 +16,8 @@ export async function POST(req: Request) {
         body: JSON.stringify({
           model: "gpt-4o", // Replace with your desired model ID
           messages: [{ role: "user", content: message }],
+          max_tokens: 128, // Add max_tokens if required by API
+          temperature: 0.7, // Add temperature if required by API
         }),
       }
     );

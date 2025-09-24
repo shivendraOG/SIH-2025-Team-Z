@@ -1,3 +1,4 @@
+import ChatBot from "@/components/ChatBot";
 import "./globals.css";
 import { AuthProvider } from "@/context/authContext";
 import type { Metadata } from 'next';
@@ -16,6 +17,7 @@ export default function RootLayout({
     <html lang="en">
       <body>
         <AuthProvider>{children}</AuthProvider>
+        <ChatBot />
       </body>
     </html>
   );
