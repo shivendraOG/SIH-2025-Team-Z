@@ -1,8 +1,8 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
+import { useState, useEffect } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -10,7 +10,7 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
+} from "@/components/ui/dropdown-menu";
 import {
   BookOpen,
   Trophy,
@@ -34,40 +34,42 @@ import {
   LogOut,
   Menu,
   X,
-} from "lucide-react"
+} from "lucide-react";
 
 // Extend Window type to include firebase
 declare global {
   interface Window {
-    firebase?: any
+    firebase?: any;
   }
 }
-import booksDataRaw from "@/data/books.json"
+import booksDataRaw from "@/data/books.json";
 
-import TodoList from "@/components/TodoList"
-import { useContext } from "react"
+import TodoList from "@/components/TodoList";
+import { useContext } from "react";
 // Assuming you will create this context in context/TodoContext.tsx
-import { TodoContext, TodoProvider } from "@/context/TodoContext"
+import { TodoContext, TodoProvider } from "@/context/TodoContext";
 
 interface Book {
-  class: string
-  subject: string
-  title: string
-  chapters: { chapter: string; url: string }[]
+  class: string;
+  subject: string;
+  title: string;
+  chapters: { chapter: string; url: string }[];
 }
 
-const booksData: Book[] = booksDataRaw as Book[]
+const booksData: Book[] = booksDataRaw as Book[];
 
 function BooksSection({ userClass }: { userClass: string }) {
   function normalizeClass(val: string) {
-    if (!val) return ""
-    const match = val.match(/\d+/)
-    return match ? match[0] : val.trim().toLowerCase()
+    if (!val) return "";
+    const match = val.match(/\d+/);
+    return match ? match[0] : val.trim().toLowerCase();
   }
-  const userClassNorm = normalizeClass(userClass)
+  const userClassNorm = normalizeClass(userClass || "");
   const filteredBooks = Array.isArray(booksData)
-    ? booksData.filter((book: Book) => normalizeClass(book.class) === userClassNorm)
-    : []
+    ? booksData.filter(
+        (book: Book) => normalizeClass(book.class) === userClassNorm
+      )
+    : [];
 
   if (!userClassNorm) {
     return (
@@ -75,11 +77,13 @@ function BooksSection({ userClass }: { userClass: string }) {
         <CardContent className="p-4">
           <div className="flex items-center gap-3 text-amber-700">
             <BookOpen className="h-5 w-5" />
-            <span className="text-sm font-medium">Please complete your profile to see books for your class.</span>
+            <span className="text-sm font-medium">
+              Please complete your profile to see books for your class.
+            </span>
           </div>
         </CardContent>
       </Card>
-    )
+    );
   }
   if (filteredBooks.length === 0) {
     return (
@@ -87,11 +91,13 @@ function BooksSection({ userClass }: { userClass: string }) {
         <CardContent className="p-4">
           <div className="flex items-center gap-3 text-blue-700">
             <BookOpen className="h-5 w-5" />
-            <span className="text-sm font-medium">No books found for your class.</span>
+            <span className="text-sm font-medium">
+              No books found for your class.
+            </span>
           </div>
         </CardContent>
       </Card>
-    )
+    );
   }
 
   const subjectColors = {
@@ -100,11 +106,11 @@ function BooksSection({ userClass }: { userClass: string }) {
     English: "from-purple-500 to-violet-600",
     History: "from-orange-500 to-red-600",
     Geography: "from-teal-500 to-cyan-600",
-  }
+  };
 
   return (
     <div className="space-y-4">
-      {filteredBooks.map((book) => (
+      {filteredBooks.map((book: Book) => (
         <Card
           key={book.subject}
           className="group hover:shadow-lg transition-all duration-300 border-0 bg-white/80 backdrop-blur-sm"
@@ -112,16 +118,21 @@ function BooksSection({ userClass }: { userClass: string }) {
           <CardContent className="p-6">
             <div className="flex items-start gap-4">
               <div
-                className={`p-3 rounded-xl bg-gradient-to-br ${subjectColors[book.subject as keyof typeof subjectColors] || "from-gray-500 to-gray-600"} text-white shadow-lg`}
+                className={`p-3 rounded-xl bg-gradient-to-br ${
+                  subjectColors[book.subject as keyof typeof subjectColors] ||
+                  "from-gray-500 to-gray-600"
+                } text-white shadow-lg`}
               >
                 <BookOpen className="h-6 w-6" />
               </div>
               <div className="flex-1">
-                <h3 className="font-bold text-gray-900 text-lg mb-1">{book.title}</h3>
+                <h3 className="font-bold text-gray-900 text-lg mb-1">
+                  {book.title}
+                </h3>
                 <p className="text-sm text-gray-600 mb-4">{book.subject}</p>
                 {book.chapters && book.chapters.length > 0 && (
                   <div className="space-y-2">
-                    {book.chapters.slice(0, 3).map((ch) => (
+                    {book.chapters.slice(0, 3).map((ch: { chapter: string; url: string }) => (
                       <a
                         key={ch.chapter}
                         href={ch.url}
@@ -134,7 +145,9 @@ function BooksSection({ userClass }: { userClass: string }) {
                       </a>
                     ))}
                     {book.chapters.length > 3 && (
-                      <span className="text-xs text-gray-500 ml-2">+{book.chapters.length - 3} more chapters</span>
+                      <span className="text-xs text-gray-500 ml-2">
+                        +{book.chapters.length - 3} more chapters
+                      </span>
                     )}
                   </div>
                 )}
@@ -144,55 +157,55 @@ function BooksSection({ userClass }: { userClass: string }) {
         </Card>
       ))}
     </div>
-  )
+  );
 }
 
 // Utility function for greeting
 function getGreeting() {
-  const hour = new Date().getHours()
-  if (hour < 12) return "Good Morning"
-  if (hour < 17) return "Good Afternoon"
-  return "Good Evening"
+  const hour = new Date().getHours();
+  if (hour < 12) return "Good Morning";
+  if (hour < 17) return "Good Afternoon";
+  return "Good Evening";
 }
 
 // Math mini-game: simple addition questions awarding xp
 function MathMiniGame({ onComplete }: { onComplete: (xp: number) => void }) {
-  const [q, setQ] = useState({ a: 0, b: 0, options: [] as number[] })
-  const [score, setScore] = useState(0)
-  const TARGET = 50
-  const [finished, setFinished] = useState(false)
+  const [q, setQ] = useState({ a: 0, b: 0, options: [] as number[] });
+  const [score, setScore] = useState(0);
+  const TARGET = 50;
+  const [finished, setFinished] = useState(false);
 
   useEffect(() => {
-    generate()
-  }, [])
+    generate();
+  }, []);
 
   function generate() {
-    const a = Math.floor(Math.random() * 12) + 1
-    const b = Math.floor(Math.random() * 12) + 1
-    const correct = a + b
-    const options = new Set<number>([correct])
+    const a = Math.floor(Math.random() * 12) + 1;
+    const b = Math.floor(Math.random() * 12) + 1;
+    const correct = a + b;
+    const options = new Set<number>([correct]);
     while (options.size < 4) {
-      options.add(correct + (Math.floor(Math.random() * 11) - 5))
+      options.add(correct + (Math.floor(Math.random() * 11) - 5));
     }
-    const opts = Array.from(options).sort(() => Math.random() - 0.5)
-    setQ({ a, b, options: opts })
+    const opts = Array.from(options).sort(() => Math.random() - 0.5);
+    setQ({ a, b, options: opts });
   }
 
   function choose(opt: number) {
-    if (finished) return
+    if (finished) return;
     if (opt === q.a + q.b) {
-      const newScore = score + 10
-      setScore(newScore)
+      const newScore = score + 10;
+      setScore(newScore);
       if (newScore >= TARGET) {
-        setFinished(true)
+        setFinished(true);
         setTimeout(() => {
-          onComplete(newScore)
-        }, 800)
+          onComplete(newScore);
+        }, 800);
       } else {
-        generate()
+        generate();
       }
     } else {
-      generate()
+      generate();
     }
   }
 
@@ -221,7 +234,9 @@ function MathMiniGame({ onComplete }: { onComplete: (xp: number) => void }) {
           ))}
         </div>
         <div className="text-center">
-          <div className="text-lg text-blue-700 font-semibold mb-2">Score: {score}</div>
+          <div className="text-lg text-blue-700 font-semibold mb-2">
+            Score: {score}
+          </div>
           <div className="text-sm text-blue-600 bg-blue-100 px-4 py-2 rounded-full">
             Reach {TARGET} points to finish! 🎯
           </div>
@@ -234,40 +249,40 @@ function MathMiniGame({ onComplete }: { onComplete: (xp: number) => void }) {
         )}
       </CardContent>
     </Card>
-  )
+  );
 }
 
 // Word mini-game
 function WordMiniGame({ onComplete }: { onComplete: (xp: number) => void }) {
-  const words = ["earth", "river", "planet", "school", "puzzle", "science"]
-  const [word, setWord] = useState("")
-  const [scrambled, setScrambled] = useState("")
-  const [input, setInput] = useState("")
+  const words = ["earth", "river", "planet", "school", "puzzle", "science"];
+  const [word, setWord] = useState("");
+  const [scrambled, setScrambled] = useState("");
+  const [input, setInput] = useState("");
 
   useEffect(() => {
-    const w = words[Math.floor(Math.random() * words.length)]
-    setWord(w)
-    setScrambled(shuffle(w))
-  }, [])
+    const w = words[Math.floor(Math.random() * words.length)];
+    setWord(w);
+    setScrambled(shuffle(w));
+  }, []);
 
   function shuffle(s: string) {
     return s
       .split("")
       .sort(() => Math.random() - 0.5)
-      .join("")
+      .join("");
   }
 
   function submit() {
     if (input.trim().toLowerCase() === word) {
-      onComplete(30)
+      onComplete(30);
     } else {
-      setInput("")
-      setScrambled(word)
+      setInput("");
+      setScrambled(word);
       setTimeout(() => {
-        const nw = words[Math.floor(Math.random() * words.length)]
-        setWord(nw)
-        setScrambled(shuffle(nw))
-      }, 1000)
+        const nw = words[Math.floor(Math.random() * words.length)];
+        setWord(nw);
+        setScrambled(shuffle(nw));
+      }, 1000);
     }
   }
 
@@ -279,7 +294,9 @@ function WordMiniGame({ onComplete }: { onComplete: (xp: number) => void }) {
             <PenTool className="h-6 w-6 text-purple-600" />
             <h3 className="text-xl font-bold text-purple-800">Word Scramble</h3>
           </div>
-          <div className="text-4xl font-bold text-pink-700 mb-6 tracking-wider">{scrambled}</div>
+          <div className="text-4xl font-bold text-pink-700 mb-6 tracking-wider">
+            {scrambled}
+          </div>
         </div>
         <input
           value={input}
@@ -296,10 +313,10 @@ function WordMiniGame({ onComplete }: { onComplete: (xp: number) => void }) {
           </Button>
           <Button
             onClick={() => {
-              const nw = words[Math.floor(Math.random() * words.length)]
-              setWord(nw)
-              setScrambled(shuffle(nw))
-              setInput("")
+              const nw = words[Math.floor(Math.random() * words.length)];
+              setWord(nw);
+              setScrambled(shuffle(nw));
+              setInput("");
             }}
             variant="outline"
             className="border-orange-300 text-orange-600 hover:bg-orange-50"
@@ -312,60 +329,52 @@ function WordMiniGame({ onComplete }: { onComplete: (xp: number) => void }) {
         </div>
       </CardContent>
     </Card>
-  )
+  );
+}
+
+function capitalizeFullName(name: string) {
+  return name
+    .split(" ")
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+    .join(" ");
 }
 
 function DashboardContent() {
-  const [xp, setXp] = useState(850)
-  const [greeting, setGreeting] = useState(getGreeting())
-  const [xpProgress, setXpProgress] = useState(0)
+  const [xp, setXp] = useState(850);
+  const [greeting] = useState(getGreeting());
   const [profile, setProfile] = useState({
-    fullName: "",
+    fullName: "Student",
     className: "",
     dateOfBirth: "",
     schoolName: "",
-  })
-  const [loadingProfile, setLoadingProfile] = useState(true)
-  const [profileError, setProfileError] = useState("")
-  const [showMobileNav, setShowMobileNav] = useState(false)
+  });
+  const [loadingProfile, setLoadingProfile] = useState(true);
+  const [profileError, setProfileError] = useState("");
+  const [showMobileNav, setShowMobileNav] = useState(false);
 
   useEffect(() => {
-    const token = localStorage.getItem("firebaseToken")
+    const token = localStorage.getItem("firebaseToken");
     if (!token) {
-      window.location.href = "/"
+      window.location.href = "/";
     }
-  }, [])
-
-  useEffect(() => {
-    let progress = 0
-    const interval = setInterval(() => {
-      progress += 5
-      if (progress >= 60) {
-        progress = 60
-        clearInterval(interval)
-      }
-      setXpProgress(progress)
-    }, 40)
-    return () => clearInterval(interval)
-  }, [])
-
-  function capitalizeFullName(name: string) {
-    return name
-      .split(" ")
-      .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
-      .join(" ")
-  }
+  }, []);
 
   useEffect(() => {
     async function fetchProfile() {
-      setLoadingProfile(true)
-      setProfileError("")
+      setLoadingProfile(true);
+      setProfileError("");
       try {
-        const token = localStorage.getItem("firebaseToken")
+        const token = localStorage.getItem("firebaseToken");
         if (!token) {
-          setProfileError("Not logged in. Please login.")
-          setLoadingProfile(false)
-          return
+          setProfileError("Not logged in. Please login.");
+          setProfile({
+            fullName: "Student",
+            className: "",
+            dateOfBirth: "",
+            schoolName: "",
+          });
+          setLoadingProfile(false);
+          return;
         }
 
         const res = await fetch("/api/users/profile", {
@@ -374,35 +383,49 @@ function DashboardContent() {
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
           },
-        })
+        });
 
-        const data = await res.json()
+        const data = await res.json();
 
-        if (!res.ok || !data.success) {
-          setProfileError(`Failed to fetch profile. ${data.message || "Please try again."}`)
+        if (!res.ok || !data.success || !data.user) {
+          setProfileError(
+            `Failed to fetch profile. ${data.message || "Please try again."}`
+          );
+          setProfile({
+            fullName: "Student",
+            className: "",
+            dateOfBirth: "",
+            schoolName: "",
+          });
         } else {
-          const user = data.user
-          if (user) {
-            setProfile({
-              fullName: capitalizeFullName(user.fullName || ""),
-              className: user.className || "",
-              dateOfBirth: user.dateOfBirth || "",
-              schoolName: user.schoolName || "",
-            })
-            setXp(user.xp ?? xp)
-          } else {
-            setProfileError("No profile data found.")
-          }
+          const user = data.user;
+          setProfile({
+            fullName: user.fullName
+              ? capitalizeFullName(user.fullName)
+              : "Student",
+            className: user.className || "",
+            dateOfBirth: user.dateOfBirth || "",
+            schoolName: user.schoolName || "",
+          });
+          setXp(user.xp ?? xp);
         }
       } catch (err) {
-        setProfileError("Error fetching profile. Please check your connection.")
-        console.error("Failed to fetch profile", err)
+        setProfileError(
+          "Error fetching profile. Please check your connection."
+        );
+        setProfile({
+          fullName: "Student",
+          className: "",
+          dateOfBirth: "",
+          schoolName: "",
+        });
+        console.error("Failed to fetch profile", err);
       } finally {
-        setLoadingProfile(false)
+        setLoadingProfile(false);
       }
     }
-    fetchProfile()
-  }, [])
+    fetchProfile();
+  }, []);
 
   const subjects = [
     {
@@ -429,51 +452,51 @@ function DashboardContent() {
       lessons: 16,
       completed: 14,
     },
-  ]
+  ];
 
-  const [fillWidths, setFillWidths] = useState(subjects.map(() => 0))
+  const [fillWidths, setFillWidths] = useState(subjects.map(() => 0));
   useEffect(() => {
-    const timers: number[] = []
+    const timers: number[] = [];
     subjects.forEach((s, idx) => {
-      let w = 0
+      let w = 0;
       const t = window.setInterval(() => {
-        w += 3
+        w += 3;
         if (w >= s.progress) {
-          w = s.progress
-          clearInterval(t)
+          w = s.progress;
+          clearInterval(t);
         }
         setFillWidths((prev) => {
-          const next = [...prev]
-          next[idx] = w
-          return next
-        })
-      }, 20)
-      timers.push(t)
-    })
-    return () => timers.forEach((t) => clearInterval(t))
-  }, [])
+          const next = [...prev];
+          next[idx] = w;
+          return next;
+        });
+      }, 20);
+      timers.push(t);
+    });
+    return () => timers.forEach((t) => clearInterval(t));
+  }, []);
 
   const handleLogout = async () => {
-    localStorage.removeItem("firebaseToken")
-    window.location.href = "/"
-  }
+    localStorage.removeItem("firebaseToken");
+    window.location.href = "/";
+  };
 
-  const [showGame, setShowGame] = useState(false)
-  const [activeGame, setActiveGame] = useState<string | null>(null)
+  const [showGame, setShowGame] = useState(false);
+  const [activeGame, setActiveGame] = useState<string | null>(null);
 
   function openGame(gameTitle: string) {
-    setActiveGame(gameTitle)
-    setShowGame(true)
+    setActiveGame(gameTitle);
+    setShowGame(true);
   }
   function closeGame() {
-    setShowGame(false)
-    setActiveGame(null)
+    setShowGame(false);
+    setActiveGame(null);
   }
 
   async function handleGameComplete(earnedXp: number) {
-    setXp((prev) => prev + earnedXp)
+    setXp((prev) => prev + earnedXp);
     try {
-      const token = localStorage.getItem("firebaseToken")
+      const token = localStorage.getItem("firebaseToken");
       await fetch("/api/users/updateXp", {
         method: "PUT",
         headers: {
@@ -481,11 +504,11 @@ function DashboardContent() {
           Authorization: token ? `Bearer ${token}` : "",
         },
         body: JSON.stringify({ xp: earnedXp }),
-      })
+      });
     } catch (err) {
-      console.error("Failed to update xp on server:", err)
+      console.error("Failed to update xp on server:", err);
     }
-    closeGame()
+    closeGame();
   }
 
   return (
@@ -502,25 +525,41 @@ function DashboardContent() {
                   {loadingProfile
                     ? "Loading..."
                     : profileError
-                      ? "Dashboard"
-                      : `${greeting}, ${profile.fullName?.split(" ")[0] || "Student"}!`}
+                    ? "Dashboard"
+                    : `${greeting}, ${
+                        profile.fullName?.split(" ")[0] || "Student"
+                      }!`}
                 </h1>
-                <p className="text-xs sm:text-sm text-gray-600 hidden sm:block">Ready to learn something new?</p>
+                <p className="text-xs sm:text-sm text-gray-600 hidden sm:block">
+                  Ready to learn something new?
+                </p>
               </div>
             </div>
 
             <div className="flex items-center gap-2 sm:gap-4 flex-shrink-0">
               {/* Desktop navigation */}
               <nav className="hidden md:flex items-center gap-1">
-                <Button variant="ghost" size="sm" className="text-gray-600 hover:text-gray-900">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="text-gray-600 hover:text-gray-900"
+                >
                   <Home className="h-4 w-4 mr-2" />
                   Home
                 </Button>
-                <Button variant="ghost" size="sm" className="text-gray-600 hover:text-gray-900">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="text-gray-600 hover:text-gray-900"
+                >
                   <BookOpen className="h-4 w-4 mr-2" />
                   Courses
                 </Button>
-                <Button variant="ghost" size="sm" className="text-gray-600 hover:text-gray-900">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="text-gray-600 hover:text-gray-900"
+                >
                   <Trophy className="h-4 w-4 mr-2" />
                   Achievements
                 </Button>
@@ -534,7 +573,10 @@ function DashboardContent() {
               {/* Avatar dropdown menu */}
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" className="relative h-8 w-8 rounded-full p-0">
+                  <Button
+                    variant="ghost"
+                    className="relative h-8 w-8 rounded-full p-0"
+                  >
                     <img
                       src="/student-avatar.png"
                       alt="Profile"
@@ -545,7 +587,9 @@ function DashboardContent() {
                 <DropdownMenuContent className="w-56" align="end" forceMount>
                   <DropdownMenuLabel className="font-normal">
                     <div className="flex flex-col space-y-1">
-                      <p className="text-sm font-medium leading-none">{profile.fullName || "Student"}</p>
+                      <p className="text-sm font-medium leading-none">
+                        {profile.fullName || "Student"}
+                      </p>
                       <p className="text-xs leading-none text-muted-foreground">
                         Class {profile.className || "Not set"}
                       </p>
@@ -556,7 +600,7 @@ function DashboardContent() {
                     <User className="mr-2 h-4 w-4" />
                     <span
                       style={{ cursor: "pointer" }}
-                      onClick={() => window.location.href = "/profile"}
+                      onClick={() => (window.location.href = "/profile")}
                     >
                       Profile
                     </span>
@@ -578,8 +622,17 @@ function DashboardContent() {
               </DropdownMenu>
 
               {/* Mobile menu button */}
-              <Button variant="ghost" size="sm" className="md:hidden" onClick={() => setShowMobileNav(!showMobileNav)}>
-                {showMobileNav ? <X className="h-4 w-4" /> : <Menu className="h-4 w-4" />}
+              <Button
+                variant="ghost"
+                size="sm"
+                className="md:hidden"
+                onClick={() => setShowMobileNav(!showMobileNav)}
+              >
+                {showMobileNav ? (
+                  <X className="h-4 w-4" />
+                ) : (
+                  <Menu className="h-4 w-4" />
+                )}
               </Button>
             </div>
           </div>
@@ -588,23 +641,43 @@ function DashboardContent() {
           {showMobileNav && (
             <div className="md:hidden border-t border-gray-200 py-4">
               <nav className="flex flex-col space-y-2">
-                <Button variant="ghost" size="sm" className="justify-start text-gray-600 hover:text-gray-900">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="justify-start text-gray-600 hover:text-gray-900"
+                >
                   <Home className="h-4 w-4 mr-2" />
                   Home
                 </Button>
-                <Button variant="ghost" size="sm" className="justify-start text-gray-600 hover:text-gray-900">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="justify-start text-gray-600 hover:text-gray-900"
+                >
                   <BookOpen className="h-4 w-4 mr-2" />
                   Courses
                 </Button>
-                <Button variant="ghost" size="sm" className="justify-start text-gray-600 hover:text-gray-900">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="justify-start text-gray-600 hover:text-gray-900"
+                >
                   <Trophy className="h-4 w-4 mr-2" />
                   Achievements
                 </Button>
-                <Button variant="ghost" size="sm" className="justify-start text-gray-600 hover:text-gray-900">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="justify-start text-gray-600 hover:text-gray-900"
+                >
                   <User className="h-4 w-4 mr-2" />
                   Profile
                 </Button>
-                <Button variant="ghost" size="sm" className="justify-start text-gray-600 hover:text-gray-900">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="justify-start text-gray-600 hover:text-gray-900"
+                >
                   <Settings className="h-4 w-4 mr-2" />
                   Settings
                 </Button>
@@ -651,7 +724,7 @@ function DashboardContent() {
               <CardContent>
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6">
                   {subjects.map((subject, idx) => {
-                    const IconComponent = subject.icon
+                    const IconComponent = subject.icon;
                     return (
                       <div key={subject.name} className="text-center">
                         <div
@@ -662,7 +735,9 @@ function DashboardContent() {
                         <h3 className="font-semibold text-gray-900 mb-1 sm:mb-2 text-sm sm:text-base">
                           {subject.name}
                         </h3>
-                        <div className="text-xl sm:text-2xl font-bold text-gray-900 mb-1">{subject.progress}%</div>
+                        <div className="text-xl sm:text-2xl font-bold text-gray-900 mb-1">
+                          {subject.progress}%
+                        </div>
                         <div className="text-xs sm:text-sm text-gray-600 mb-2 sm:mb-3">
                           {subject.completed}/{subject.lessons} lessons
                         </div>
@@ -673,7 +748,7 @@ function DashboardContent() {
                           />
                         </div>
                       </div>
-                    )
+                    );
                   })}
                 </div>
               </CardContent>
@@ -688,7 +763,7 @@ function DashboardContent() {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <BooksSection userClass={profile.className} />
+                <BooksSection userClass={profile.className || ""} />
               </CardContent>
             </Card>
           </div>
@@ -713,11 +788,18 @@ function DashboardContent() {
                         <Calculator className="h-4 w-4 sm:h-5 sm:w-5 text-white" />
                       </div>
                       <div className="min-w-0 flex-1">
-                        <h3 className="font-semibold text-gray-900 text-sm sm:text-base">Math Puzzles</h3>
-                        <p className="text-xs sm:text-sm text-gray-600">742 playing</p>
+                        <h3 className="font-semibold text-gray-900 text-sm sm:text-base">
+                          Math Puzzles
+                        </h3>
+                        <p className="text-xs sm:text-sm text-gray-600">
+                          742 playing
+                        </p>
                       </div>
                     </div>
-                    <Button size="sm" className="bg-blue-600 hover:bg-blue-700 h-8 w-8 sm:h-9 sm:w-9 p-0">
+                    <Button
+                      size="sm"
+                      className="bg-blue-600 hover:bg-blue-700 h-8 w-8 sm:h-9 sm:w-9 p-0"
+                    >
                       <Play className="h-3 w-3 sm:h-4 sm:w-4" />
                     </Button>
                   </div>
@@ -733,11 +815,18 @@ function DashboardContent() {
                         <PenTool className="h-4 w-4 sm:h-5 sm:w-5 text-white" />
                       </div>
                       <div className="min-w-0 flex-1">
-                        <h3 className="font-semibold text-gray-900 text-sm sm:text-base">Word Games</h3>
-                        <p className="text-xs sm:text-sm text-gray-600">523 playing</p>
+                        <h3 className="font-semibold text-gray-900 text-sm sm:text-base">
+                          Word Games
+                        </h3>
+                        <p className="text-xs sm:text-sm text-gray-600">
+                          523 playing
+                        </p>
                       </div>
                     </div>
-                    <Button size="sm" className="bg-purple-600 hover:bg-purple-700 h-8 w-8 sm:h-9 sm:w-9 p-0">
+                    <Button
+                      size="sm"
+                      className="bg-purple-600 hover:bg-purple-700 h-8 w-8 sm:h-9 sm:w-9 p-0"
+                    >
                       <Play className="h-3 w-3 sm:h-4 sm:w-4" />
                     </Button>
                   </div>
@@ -755,33 +844,45 @@ function DashboardContent() {
               <CardContent className="space-y-2 sm:space-y-3">
                 {/** Get tasks from TodoContext */}
                 {(() => {
-                  const { tasks } = useContext(TodoContext) || { tasks: [] }
+                  const { tasks } = useContext(TodoContext) || { tasks: [] };
                   if (!tasks || tasks.length === 0) {
                     return (
-                      <div className="text-gray-500 text-sm">No tasks for today! 🎉</div>
-                    )
+                      <div className="text-gray-500 text-sm">
+                        No tasks for today! 🎉
+                      </div>
+                    );
                   }
                   return tasks.map((task: any, idx: number) => {
                     // Color/icon logic based on task type or index
-                    let bg = "bg-green-50 border-green-200 text-green-800"
-                    let Icon = CheckCircle
+                    let bg = "bg-green-50 border-green-200 text-green-800";
+                    let Icon = CheckCircle;
                     if (task.type === "reading" || idx % 3 === 1) {
-                      bg = "bg-blue-50 border-blue-200 text-blue-800"
-                      Icon = Clock
+                      bg = "bg-blue-50 border-blue-200 text-blue-800";
+                      Icon = Clock;
                     } else if (task.type === "video" || idx % 3 === 2) {
-                      bg = "bg-purple-50 border-purple-200 text-purple-800"
-                      Icon = Video
+                      bg = "bg-purple-50 border-purple-200 text-purple-800";
+                      Icon = Video;
                     }
                     return (
                       <div
                         key={task.id || idx}
                         className={`flex items-center gap-2 sm:gap-3 p-2 sm:p-3 rounded-lg border ${bg}`}
                       >
-                        <Icon className={`h-4 w-4 sm:h-5 sm:w-5 flex-shrink-0 ${bg.split(" ").pop()}`} />
-                        <span className={`text-xs sm:text-sm font-medium ${bg.split(" ").pop()}`}>{task.text || task.title}</span>
+                        <Icon
+                          className={`h-4 w-4 sm:h-5 sm:w-5 flex-shrink-0 ${bg
+                            .split(" ")
+                            .pop()}`}
+                        />
+                        <span
+                          className={`text-xs sm:text-sm font-medium ${bg
+                            .split(" ")
+                            .pop()}`}
+                        >
+                          {task.text || task.title}
+                        </span>
                       </div>
-                    )
-                  })
+                    );
+                  });
                 })()}
               </CardContent>
             </Card>
@@ -796,10 +897,14 @@ function DashboardContent() {
               <CardContent className="space-y-2 sm:space-y-3">
                 <div className="flex items-center gap-2 sm:gap-3 p-2 sm:p-3 rounded-lg bg-gradient-to-r from-amber-50 to-yellow-50 border border-amber-200">
                   <div className="w-6 h-6 sm:w-8 sm:h-8 bg-gradient-to-br from-amber-500 to-yellow-600 rounded-full flex items-center justify-center flex-shrink-0">
-                    <span className="text-white font-bold text-xs sm:text-sm">1</span>
+                    <span className="text-white font-bold text-xs sm:text-sm">
+                      1
+                    </span>
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="font-semibold text-gray-900 text-sm sm:text-base truncate">Ravi Kumar</p>
+                    <p className="font-semibold text-gray-900 text-sm sm:text-base truncate">
+                      Ravi Kumar
+                    </p>
                     <p className="text-xs sm:text-sm text-gray-600">3,200 XP</p>
                   </div>
                   <Star className="h-4 w-4 sm:h-5 sm:w-5 text-amber-500 flex-shrink-0" />
@@ -807,30 +912,42 @@ function DashboardContent() {
 
                 <div className="flex items-center gap-2 sm:gap-3 p-2 sm:p-3 rounded-lg bg-gray-50 border border-gray-200">
                   <div className="w-6 h-6 sm:w-8 sm:h-8 bg-gradient-to-br from-gray-400 to-gray-600 rounded-full flex items-center justify-center flex-shrink-0">
-                    <span className="text-white font-bold text-xs sm:text-sm">2</span>
+                    <span className="text-white font-bold text-xs sm:text-sm">
+                      2
+                    </span>
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="font-semibold text-gray-900 text-sm sm:text-base truncate">Priya Singh</p>
+                    <p className="font-semibold text-gray-900 text-sm sm:text-base truncate">
+                      Priya Singh
+                    </p>
                     <p className="text-xs sm:text-sm text-gray-600">2,950 XP</p>
                   </div>
                 </div>
 
                 <div className="flex items-center gap-2 sm:gap-3 p-2 sm:p-3 rounded-lg bg-orange-50 border border-orange-200">
                   <div className="w-6 h-6 sm:w-8 sm:h-8 bg-gradient-to-br from-orange-500 to-red-600 rounded-full flex items-center justify-center flex-shrink-0">
-                    <span className="text-white font-bold text-xs sm:text-sm">3</span>
+                    <span className="text-white font-bold text-xs sm:text-sm">
+                      3
+                    </span>
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="font-semibold text-gray-900 text-sm sm:text-base truncate">Fatima Khan</p>
+                    <p className="font-semibold text-gray-900 text-sm sm:text-base truncate">
+                      Fatima Khan
+                    </p>
                     <p className="text-xs sm:text-sm text-gray-600">2,600 XP</p>
                   </div>
                 </div>
 
                 <div className="flex items-center gap-2 sm:gap-3 p-2 sm:p-3 rounded-lg bg-gradient-to-r from-blue-50 to-indigo-50 border-2 border-blue-300">
                   <div className="w-6 h-6 sm:w-8 sm:h-8 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-full flex items-center justify-center flex-shrink-0">
-                    <span className="text-white font-bold text-xs sm:text-sm">4</span>
+                    <span className="text-white font-bold text-xs sm:text-sm">
+                      4
+                    </span>
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="font-semibold text-gray-900 text-sm sm:text-base truncate">You!</p>
+                    <p className="font-semibold text-gray-900 text-sm sm:text-base truncate">
+                      You!
+                    </p>
                     <p className="text-xs sm:text-sm text-gray-600">{xp} XP</p>
                   </div>
                   <Target className="h-4 w-4 sm:h-5 sm:w-5 text-blue-500 flex-shrink-0" />
@@ -845,26 +962,39 @@ function DashboardContent() {
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-2 sm:p-4 backdrop-blur-sm">
           <div className="bg-white rounded-2xl w-full max-w-2xl h-[90vh] sm:h-[600px] overflow-hidden relative shadow-2xl">
             <div className="absolute top-2 right-2 sm:top-4 sm:right-4 z-10">
-              <Button onClick={closeGame} variant="ghost" size="sm" className="rounded-full w-8 h-8 p-0">
+              <Button
+                onClick={closeGame}
+                variant="ghost"
+                size="sm"
+                className="rounded-full w-8 h-8 p-0"
+              >
                 ✕
               </Button>
             </div>
             <div className="p-3 sm:p-6 h-full">
               <div className="mb-4 sm:mb-6">
-                <h3 className="text-xl sm:text-2xl font-bold text-gray-900 mb-1 sm:mb-2">{activeGame}</h3>
+                <h3 className="text-xl sm:text-2xl font-bold text-gray-900 mb-1 sm:mb-2">
+                  {activeGame}
+                </h3>
                 <p className="text-sm sm:text-base text-gray-600">
                   Complete challenges to earn XP and climb the leaderboard!
                 </p>
               </div>
 
               <div className="h-[calc(100%-100px)] sm:h-[calc(100%-120px)]">
-                {activeGame === "Math Puzzles" && <MathMiniGame onComplete={handleGameComplete} />}
-                {activeGame === "Word Games" && <WordMiniGame onComplete={handleGameComplete} />}
+                {activeGame === "Math Puzzles" && (
+                  <MathMiniGame onComplete={handleGameComplete} />
+                )}
+                {activeGame === "Word Games" && (
+                  <WordMiniGame onComplete={handleGameComplete} />
+                )}
                 {!["Math Puzzles", "Word Games"].includes(activeGame || "") && (
                   <Card className="h-full flex items-center justify-center">
                     <CardContent className="text-center">
                       <Gamepad2 className="h-12 w-12 sm:h-16 sm:w-16 text-gray-400 mx-auto mb-4" />
-                      <p className="text-gray-500 text-sm sm:text-base">Game not available yet</p>
+                      <p className="text-gray-500 text-sm sm:text-base">
+                        Game not available yet
+                      </p>
                     </CardContent>
                   </Card>
                 )}
@@ -874,7 +1004,7 @@ function DashboardContent() {
         </div>
       )}
     </div>
-  )
+  );
 }
 
 export default function Dashboard() {
@@ -882,5 +1012,5 @@ export default function Dashboard() {
     <TodoProvider>
       <DashboardContent />
     </TodoProvider>
-  )
+  );
 }
