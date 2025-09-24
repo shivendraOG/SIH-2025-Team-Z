@@ -1,7 +1,49 @@
 "use client"
 
-import React, { useState, useEffect } from "react";
-import booksDataRaw from "@/data/books.json"; // Adjust the path as necessary
+import { useState, useEffect } from "react"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Button } from "@/components/ui/button"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+import {
+  BookOpen,
+  Trophy,
+  Target,
+  Users,
+  Play,
+  Star,
+  Clock,
+  CheckCircle,
+  TrendingUp,
+  Award,
+  Zap,
+  Gamepad2,
+  Video,
+  FlaskConical,
+  Calculator,
+  PenTool,
+  Home,
+  User,
+  Settings,
+  LogOut,
+  Menu,
+  X,
+} from "lucide-react"
+
+// Extend Window type to include firebase
+declare global {
+  interface Window {
+    firebase?: any
+  }
+}
+import booksDataRaw from "@/data/books.json"
+import TodoList from "@/components/TodoList"
 
 interface Book {
   class: string
@@ -10,65 +52,92 @@ interface Book {
   chapters: { chapter: string; url: string }[]
 }
 
-const booksData: Book[] = booksDataRaw as Book[];
+const booksData: Book[] = booksDataRaw as Book[]
 
 function BooksSection({ userClass }: { userClass: string }) {
   function normalizeClass(val: string) {
-    if (!val) return "";
-    // Extract first number found, or fallback to trimmed string
-    const match = val.match(/\d+/);
-    return match ? match[0] : val.trim().toLowerCase();
+    if (!val) return ""
+    const match = val.match(/\d+/)
+    return match ? match[0] : val.trim().toLowerCase()
   }
-  const userClassNorm = normalizeClass(userClass);
+  const userClassNorm = normalizeClass(userClass)
   const filteredBooks = Array.isArray(booksData)
     ? booksData.filter((book: Book) => normalizeClass(book.class) === userClassNorm)
-    : [];
+    : []
 
   if (!userClassNorm) {
     return (
-      <div className="text-gray-300">Please complete your profile to see books for your class.</div>
-    );
+      <Card className="border-amber-200 bg-gradient-to-br from-amber-50 to-orange-50">
+        <CardContent className="p-4">
+          <div className="flex items-center gap-3 text-amber-700">
+            <BookOpen className="h-5 w-5" />
+            <span className="text-sm font-medium">Please complete your profile to see books for your class.</span>
+          </div>
+        </CardContent>
+      </Card>
+    )
   }
-
   if (filteredBooks.length === 0) {
     return (
-      <div className="text-gray-300">No books found for your class.</div>
-    );
+      <Card className="border-blue-200 bg-gradient-to-br from-blue-50 to-indigo-50">
+        <CardContent className="p-4">
+          <div className="flex items-center gap-3 text-blue-700">
+            <BookOpen className="h-5 w-5" />
+            <span className="text-sm font-medium">No books found for your class.</span>
+          </div>
+        </CardContent>
+      </Card>
+    )
   }
+
+  const subjectColors = {
+    Math: "from-blue-500 to-indigo-600",
+    Science: "from-green-500 to-emerald-600",
+    English: "from-purple-500 to-violet-600",
+    History: "from-orange-500 to-red-600",
+    Geography: "from-teal-500 to-cyan-600",
+  }
+
   return (
-    <div className="space-y-3">
+    <div className="space-y-4">
       {filteredBooks.map((book) => (
-        <div
+        <Card
           key={book.subject}
-          className="bg-green-600/20 border border-green-200/30 rounded-lg p-4 hover:bg-green-600/30 transition cursor-pointer shadow"
+          className="group hover:shadow-lg transition-all duration-300 border-0 bg-white/80 backdrop-blur-sm"
         >
-          <div className="flex items-center gap-3">
-            <span className="text-2xl">📖</span>
-            <div>
-              <div className="font-semibold text-white">{book.title} ({book.subject})</div>
-              <div className="text-sm text-gray-300">
-                {book.chapters && book.chapters.length > 0 ? (
-                  <ul className="list-disc ml-5 mt-2 space-y-2">
-                    {book.chapters.map((ch) => (
-                      <li key={ch.chapter}>
-                        <a
-                          href={ch.url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="inline-block px-3 py-1 rounded-full text-sm text-cyan-400 bg-cyan-800/30 hover:bg-cyan-700/50 transition-colors"
-                        >
-                          {ch.chapter}
-                        </a>
-                      </li>
+          <CardContent className="p-6">
+            <div className="flex items-start gap-4">
+              <div
+                className={`p-3 rounded-xl bg-gradient-to-br ${subjectColors[book.subject as keyof typeof subjectColors] || "from-gray-500 to-gray-600"} text-white shadow-lg`}
+              >
+                <BookOpen className="h-6 w-6" />
+              </div>
+              <div className="flex-1">
+                <h3 className="font-bold text-gray-900 text-lg mb-1">{book.title}</h3>
+                <p className="text-sm text-gray-600 mb-4">{book.subject}</p>
+                {book.chapters && book.chapters.length > 0 && (
+                  <div className="space-y-2">
+                    {book.chapters.slice(0, 3).map((ch) => (
+                      <a
+                        key={ch.chapter}
+                        href={ch.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium bg-gray-100 hover:bg-gray-200 text-gray-700 transition-colors duration-200 mr-2 mb-2"
+                      >
+                        <Play className="h-3 w-3" />
+                        {ch.chapter}
+                      </a>
                     ))}
-                  </ul>
-                ) : (
-                  <span>No chapters available.</span>
+                    {book.chapters.length > 3 && (
+                      <span className="text-xs text-gray-500 ml-2">+{book.chapters.length - 3} more chapters</span>
+                    )}
+                  </div>
                 )}
               </div>
             </div>
-          </div>
-        </div>
+          </CardContent>
+        </Card>
       ))}
     </div>
   )
