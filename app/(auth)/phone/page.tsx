@@ -1,134 +1,152 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
-import { signInWithCredential, PhoneAuthProvider, RecaptchaVerifier } from "firebase/auth"
-import { getAuthInstance } from "@/lib/firebase"
+import { useState, useEffect } from "react";
+import {
+  signInWithCredential,
+  PhoneAuthProvider,
+  RecaptchaVerifier,
+} from "firebase/auth";
+import { getAuthInstance } from "@/lib/firebase";
 
 declare global {
   interface Window {
-    recaptchaVerifier?: RecaptchaVerifier
+    recaptchaVerifier?: RecaptchaVerifier;
   }
 }
 
 export default function StudentLoginPage() {
-  const [phone, setPhone] = useState("")
-  const [otp, setOtp] = useState("")
-  const [otpSent, setOtpSent] = useState(false)
-  const [verificationId, setVerificationId] = useState<string | null>(null)
-  const [loading, setLoading] = useState(false)
-  const [cooldown, setCooldown] = useState(0)
-  const [showSuccess, setShowSuccess] = useState(false)
-  const [inputFocused, setInputFocused] = useState(false)
-  const [otpComplete, setOtpComplete] = useState(false)
-  const [shake, setShake] = useState(false)
-  const [resetTimer, setResetTimer] = useState(0)
-  const [isDarkMode, setIsDarkMode] = useState(false)
+  useEffect(() => {
+    // If already logged in, redirect to dashboard
+    if (
+      typeof window !== "undefined" &&
+      localStorage.getItem("firebaseToken")
+    ) {
+      window.location.replace("/dashboard");
+    }
+  }, []);
+  const [phone, setPhone] = useState("");
+  const [otp, setOtp] = useState("");
+  const [otpSent, setOtpSent] = useState(false);
+  const [verificationId, setVerificationId] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [cooldown, setCooldown] = useState(0);
+  const [showSuccess, setShowSuccess] = useState(false);
+  const [inputFocused, setInputFocused] = useState(false);
+  const [otpComplete, setOtpComplete] = useState(false);
+  const [shake, setShake] = useState(false);
+  const [resetTimer, setResetTimer] = useState(0);
+  const [isDarkMode, setIsDarkMode] = useState(false);
 
   useEffect(() => {
     const checkDarkMode = () => {
-      setIsDarkMode(window.matchMedia("(prefers-color-scheme: dark)").matches)
-    }
-    checkDarkMode()
-    window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", checkDarkMode)
-    return () => window.matchMedia("(prefers-color-scheme: dark)").removeEventListener("change", checkDarkMode)
-  }, [])
+      setIsDarkMode(window.matchMedia("(prefers-color-scheme: dark)").matches);
+    };
+    checkDarkMode();
+    window
+      .matchMedia("(prefers-color-scheme: dark)")
+      .addEventListener("change", checkDarkMode);
+    return () =>
+      window
+        .matchMedia("(prefers-color-scheme: dark)")
+        .removeEventListener("change", checkDarkMode);
+  }, []);
 
   useEffect(() => {
-    const auth = getAuthInstance()
-    if (!auth) return
+    const auth = getAuthInstance();
+    if (!auth) return;
 
     if (!window.recaptchaVerifier) {
       const verifier = new RecaptchaVerifier(auth, "recaptcha-container", {
         size: "invisible",
         callback: () => console.log("Recaptcha verified.."),
-      })
+      });
 
       verifier.render().then(() => {
-        window.recaptchaVerifier = verifier
-      })
+        window.recaptchaVerifier = verifier;
+      });
     }
-  }, [])
+  }, []);
 
   useEffect(() => {
-    if (cooldown <= 0) return
-    const timer = setInterval(() => setCooldown((prev) => prev - 1), 1000)
-    return () => clearInterval(timer)
-  }, [cooldown])
+    if (cooldown <= 0) return;
+    const timer = setInterval(() => setCooldown((prev) => prev - 1), 1000);
+    return () => clearInterval(timer);
+  }, [cooldown]);
 
   useEffect(() => {
-    if (resetTimer <= 0) return
-    const timer = setInterval(() => setResetTimer((prev) => prev - 1), 1000)
-    return () => clearInterval(timer)
-  }, [resetTimer])
+    if (resetTimer <= 0) return;
+    const timer = setInterval(() => setResetTimer((prev) => prev - 1), 1000);
+    return () => clearInterval(timer);
+  }, [resetTimer]);
 
   useEffect(() => {
-    setOtpComplete(otp.length === 6)
-  }, [otp])
+    setOtpComplete(otp.length === 6);
+  }, [otp]);
 
   const handlePhoneChange = (value: string) => {
-    const digits = value.replace(/\D/g, "")
+    const digits = value.replace(/\D/g, "");
     if (digits.length > 0 && !value.startsWith("+91")) {
-      setPhone(`+91${digits}`)
+      setPhone(`+91${digits}`);
     } else if (value.startsWith("+91")) {
-      setPhone(`+91${digits.slice(2)}`)
+      setPhone(`+91${digits.slice(2)}`);
     } else {
-      setPhone(value)
+      setPhone(value);
     }
-  }
+  };
 
   const handleSendOTP = async () => {
-    const auth = getAuthInstance()
-    const verifier = window.recaptchaVerifier
+    const auth = getAuthInstance();
+    const verifier = window.recaptchaVerifier;
 
     if (!auth || !verifier) {
-      setShake(true)
-      setTimeout(() => setShake(false), 500)
-      return
+      setShake(true);
+      setTimeout(() => setShake(false), 500);
+      return;
     }
 
     if (!phone) {
-      setShake(true)
-      setTimeout(() => setShake(false), 500)
-      return
+      setShake(true);
+      setTimeout(() => setShake(false), 500);
+      return;
     }
 
-    const phoneRegex = /^\+[1-9]\d{1,14}$/
+    const phoneRegex = /^\+[1-9]\d{1,14}$/;
     if (!phoneRegex.test(phone)) {
-      setShake(true)
-      setTimeout(() => setShake(false), 500)
-      return
+      setShake(true);
+      setTimeout(() => setShake(false), 500);
+      return;
     }
 
-    setLoading(true)
+    setLoading(true);
     try {
-      const phoneProvider = new PhoneAuthProvider(auth)
-      const id = await phoneProvider.verifyPhoneNumber(phone, verifier)
-      setVerificationId(id)
-      setOtpSent(true)
-      setCooldown(60)
-      setResetTimer(60)
-      setShowSuccess(true)
-      setTimeout(() => setShowSuccess(false), 3000)
+      const phoneProvider = new PhoneAuthProvider(auth);
+      const id = await phoneProvider.verifyPhoneNumber(phone, verifier);
+      setVerificationId(id);
+      setOtpSent(true);
+      setCooldown(60);
+      setResetTimer(60);
+      setShowSuccess(true);
+      setTimeout(() => setShowSuccess(false), 3000);
     } catch (err: any) {
-      console.error("Firebase Phone Auth Error:", err)
-      setShake(true)
-      setTimeout(() => setShake(false), 500)
+      console.error("Firebase Phone Auth Error:", err);
+      setShake(true);
+      setTimeout(() => setShake(false), 500);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   const handleVerifyOTP = async () => {
-    const auth = getAuthInstance()
-    if (!auth || !verificationId || !otp) return
+    const auth = getAuthInstance();
+    if (!auth || !verificationId || !otp) return;
 
-    setLoading(true)
+    setLoading(true);
     try {
-      const credential = PhoneAuthProvider.credential(verificationId, otp)
-      const result = await signInWithCredential(auth, credential)
+      const credential = PhoneAuthProvider.credential(verificationId, otp);
+      const result = await signInWithCredential(auth, credential);
 
-      const token = await result.user.getIdToken()
-      localStorage.setItem("firebaseToken", token)
+      const token = await result.user.getIdToken();
+      localStorage.setItem("firebaseToken", token);
 
       const userResponse = await fetch("/api/users/create", {
         method: "POST",
@@ -136,59 +154,59 @@ export default function StudentLoginPage() {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({ firebaseToken: token }),
-      })
+      });
 
-      const userResult = await userResponse.json()
+      const userResult = await userResponse.json();
 
       if (userResult.success) {
-        setShowSuccess(true)
+        setShowSuccess(true);
         setTimeout(() => {
           if (userResult.user.isProfileComplete) {
-            window.location.href = "/dashboard"
+            window.location.href = "/dashboard";
           } else {
-            window.location.href = "/success"
+            window.location.href = "/success";
           }
-        }, 2000)
+        }, 2000);
       } else {
-        setShake(true)
-        setTimeout(() => setShake(false), 500)
+        setShake(true);
+        setTimeout(() => setShake(false), 500);
       }
     } catch (err: any) {
-      setShake(true)
-      setTimeout(() => setShake(false), 500)
+      setShake(true);
+      setTimeout(() => setShake(false), 500);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   const handleResendOTP = () => {
-    setOtp("")
-    setOtpSent(false)
-    setVerificationId(null)
-    setResetTimer(0)
+    setOtp("");
+    setOtpSent(false);
+    setVerificationId(null);
+    setResetTimer(0);
 
     if (window.recaptchaVerifier) {
-      window.recaptchaVerifier.clear()
-      window.recaptchaVerifier = undefined
+      window.recaptchaVerifier.clear();
+      window.recaptchaVerifier = undefined;
     }
-  }
+  };
 
   const handleReset = () => {
-    setPhone("")
-    setOtp("")
-    setOtpSent(false)
-    setVerificationId(null)
-    setCooldown(0)
-    setResetTimer(0)
-    setShowSuccess(false)
-    setInputFocused(false)
-    setOtpComplete(false)
+    setPhone("");
+    setOtp("");
+    setOtpSent(false);
+    setVerificationId(null);
+    setCooldown(0);
+    setResetTimer(0);
+    setShowSuccess(false);
+    setInputFocused(false);
+    setOtpComplete(false);
 
     if (window.recaptchaVerifier) {
-      window.recaptchaVerifier.clear()
-      window.recaptchaVerifier = undefined
+      window.recaptchaVerifier.clear();
+      window.recaptchaVerifier = undefined;
     }
-  }
+  };
 
   return (
     <div
@@ -259,37 +277,56 @@ export default function StudentLoginPage() {
 
       <div
         className={`max-w-md w-full backdrop-blur-sm rounded-3xl shadow-2xl border p-8 space-y-6 transform transition-all duration-500 ${
-          isDarkMode ? "bg-gray-800/90 border-gray-700/20 text-white" : "bg-white/90 border-white/20 text-gray-900"
-        } ${shake ? "animate-pulse scale-105" : "scale-100"} ${showSuccess ? "ring-4 ring-green-300" : ""}`}
+          isDarkMode
+            ? "bg-gray-800/90 border-gray-700/20 text-white"
+            : "bg-white/90 border-white/20 text-gray-900"
+        } ${shake ? "animate-pulse scale-105" : "scale-100"} ${
+          showSuccess ? "ring-4 ring-green-300" : ""
+        }`}
       >
         <div className="text-center space-y-4">
           <div className="relative inline-block">
             <div className="text-6xl animate-bounce">🎓</div>
-            <div className="absolute -top-2 -right-2 text-2xl animate-spin" style={{ animationDuration: "3s" }}>
+            <div
+              className="absolute -top-2 -right-2 text-2xl animate-spin"
+              style={{ animationDuration: "3s" }}
+            >
               ✨
             </div>
           </div>
           <h1
             className={`text-4xl font-bold bg-gradient-to-r bg-clip-text text-transparent ${
-              isDarkMode ? "from-blue-400 via-purple-400 to-cyan-400" : "from-blue-600 via-purple-600 to-indigo-600"
+              isDarkMode
+                ? "from-blue-400 via-purple-400 to-cyan-400"
+                : "from-blue-600 via-purple-600 to-indigo-600"
             }`}
           >
             Student Portal
           </h1>
-          <p className={`text-lg ${isDarkMode ? "text-gray-300" : "text-gray-600"}`}>
+          <p
+            className={`text-lg ${
+              isDarkMode ? "text-gray-300" : "text-gray-600"
+            }`}
+          >
             🚀 Ready to start your learning journey?
           </p>
         </div>
 
         <div className="flex justify-center space-x-2 mb-6">
           <div
-            className={`w-3 h-3 rounded-full transition-all duration-300 ${!otpSent ? "bg-blue-500 scale-125" : "bg-gray-300"}`}
+            className={`w-3 h-3 rounded-full transition-all duration-300 ${
+              !otpSent ? "bg-blue-500 scale-125" : "bg-gray-300"
+            }`}
           ></div>
           <div
-            className={`w-3 h-3 rounded-full transition-all duration-300 ${otpSent && !showSuccess ? "bg-blue-500 scale-125" : "bg-gray-300"}`}
+            className={`w-3 h-3 rounded-full transition-all duration-300 ${
+              otpSent && !showSuccess ? "bg-blue-500 scale-125" : "bg-gray-300"
+            }`}
           ></div>
           <div
-            className={`w-3 h-3 rounded-full transition-all duration-300 ${showSuccess ? "bg-green-500 scale-125" : "bg-gray-300"}`}
+            className={`w-3 h-3 rounded-full transition-all duration-300 ${
+              showSuccess ? "bg-green-500 scale-125" : "bg-gray-300"
+            }`}
           ></div>
         </div>
 
@@ -303,7 +340,11 @@ export default function StudentLoginPage() {
               >
                 📱 Phone Number
               </label>
-              <div className={`relative transition-all duration-300 ${inputFocused ? "transform scale-105" : ""}`}>
+              <div
+                className={`relative transition-all duration-300 ${
+                  inputFocused ? "transform scale-105" : ""
+                }`}
+              >
                 <input
                   type="tel"
                   placeholder="+91 9876543210"
@@ -320,8 +361,8 @@ export default function StudentLoginPage() {
                     inputFocused
                       ? "border-blue-400 ring-4 ring-blue-100 shadow-lg"
                       : isDarkMode
-                        ? "hover:border-gray-500"
-                        : "hover:border-gray-400"
+                      ? "hover:border-gray-500"
+                      : "hover:border-gray-400"
                   } ${loading ? "opacity-50" : ""}`}
                   maxLength={15}
                 />
@@ -329,7 +370,11 @@ export default function StudentLoginPage() {
                   {phone ? "✅" : "📞"}
                 </div>
               </div>
-              <p className={`text-sm flex items-center gap-1 ${isDarkMode ? "text-gray-400" : "text-gray-500"}`}>
+              <p
+                className={`text-sm flex items-center gap-1 ${
+                  isDarkMode ? "text-gray-400" : "text-gray-500"
+                }`}
+              >
                 <span>🌍</span>
                 Auto +91 added for India
               </p>
@@ -370,14 +415,27 @@ export default function StudentLoginPage() {
           <div className="space-y-6">
             <div className="text-center space-y-4">
               <div className="text-4xl animate-bounce">📨</div>
-              <p className={`font-semibold text-lg ${isDarkMode ? "text-gray-200" : "text-gray-700"}`}>
+              <p
+                className={`font-semibold text-lg ${
+                  isDarkMode ? "text-gray-200" : "text-gray-700"
+                }`}
+              >
                 Check your phone for the magic code!
               </p>
-              <p className={`text-sm ${isDarkMode ? "text-gray-400" : "text-gray-500"}`}>
-                We sent a 6-digit code to <span className="font-semibold text-blue-600">{phone}</span>
+              <p
+                className={`text-sm ${
+                  isDarkMode ? "text-gray-400" : "text-gray-500"
+                }`}
+              >
+                We sent a 6-digit code to{" "}
+                <span className="font-semibold text-blue-600">{phone}</span>
               </p>
               {resetTimer > 0 && (
-                <p className={`text-sm ${isDarkMode ? "text-gray-400" : "text-gray-500"}`}>
+                <p
+                  className={`text-sm ${
+                    isDarkMode ? "text-gray-400" : "text-gray-500"
+                  }`}
+                >
                   Reset available in {resetTimer}s
                 </p>
               )}
@@ -391,12 +449,13 @@ export default function StudentLoginPage() {
                     maxLength={1}
                     value={otp[i] || ""}
                     onChange={(e) => {
-                      const value = e.target.value.replace(/\D/, "")
-                      const newOtp = otp.substring(0, i) + value + otp.substring(i + 1)
-                      setOtp(newOtp)
+                      const value = e.target.value.replace(/\D/, "");
+                      const newOtp =
+                        otp.substring(0, i) + value + otp.substring(i + 1);
+                      setOtp(newOtp);
 
                       if (value && e.target.nextSibling) {
-                        ;(e.target.nextSibling as HTMLElement).focus()
+                        (e.target.nextSibling as HTMLElement).focus();
                       }
                     }}
                     className={`w-14 h-16 text-center text-2xl font-bold border-2 rounded-xl transition-all duration-300 ${
@@ -407,15 +466,17 @@ export default function StudentLoginPage() {
                       otp[i]
                         ? "border-green-400 bg-green-50 text-green-700 scale-110"
                         : isDarkMode
-                          ? "hover:border-blue-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
-                          : "hover:border-blue-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
+                        ? "hover:border-blue-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
+                        : "hover:border-blue-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
                     }`}
                   />
                 ))}
               </div>
 
               {otpComplete && (
-                <div className="text-center text-green-600 font-semibold animate-pulse">✅ Code Complete!</div>
+                <div className="text-center text-green-600 font-semibold animate-pulse">
+                  ✅ Code Complete!
+                </div>
               )}
             </div>
 
@@ -472,5 +533,5 @@ export default function StudentLoginPage() {
         <div id="recaptcha-container" className="hidden"></div>
       </div>
     </div>
-  )
+  );
 }
