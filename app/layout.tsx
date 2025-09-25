@@ -1,4 +1,4 @@
-import ChatBot from "@/components/ChatBot";
+import ChatBot from "../components/ChatBot";
 import "./globals.css";
 import { AuthProvider } from "@/context/authContext";
 import type { Metadata } from 'next';
