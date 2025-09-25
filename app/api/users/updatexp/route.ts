@@ -12,11 +12,11 @@ export async function PUT(request: NextRequest) {
     const userRes = await verifyTokenAndGetUser(token);
     if (!userRes.success || !userRes.user) return NextResponse.json({ success: false, message: "Invalid token" }, { status: 401 });
 
-    const currentUser = userRes.user;
-    await updateUserProfile(currentUser.firebaseUid, { xp: (currentUser.xp || 0) + xp });
+  const currentUser = userRes.user as { firebaseUid: string; xp?: number };
+  await updateUserProfile(currentUser.firebaseUid, { xp: (currentUser.xp ?? 0) + xp });
 
-    return NextResponse.json({ success: true, newXp: (currentUser.xp || 0) + xp });
-  } catch (error: any) {
+  return NextResponse.json({ success: true, newXp: (currentUser.xp ?? 0) + xp });
+  } catch (error: unknown) {
     console.error(error);
     return NextResponse.json({ success: false, message: "Server error" }, { status: 500 });
   }

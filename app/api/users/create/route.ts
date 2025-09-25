@@ -21,7 +21,7 @@ export async function POST(request: NextRequest) {
     }
 
     return NextResponse.json(result);
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Error creating/getting user:", error);
     return NextResponse.json(
       { error: "Internal server error" },

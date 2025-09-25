@@ -1,7 +1,9 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { FaUser, FaSchool, FaMapMarkerAlt, FaEnvelope, FaBirthdayCake, FaUsers, FaPhone, FaCheck, FaArrowRight } from 'react-icons/fa';
+import { useState } from 'react';
+import { FaUser, FaSchool, FaMapMarkerAlt, FaUsers, FaCheck, FaArrowRight } from 'react-icons/fa';
+// Use the App Router navigation hook (next/navigation) instead of legacy next/router
+import { useRouter } from 'next/navigation';
 
 interface UserDetails {
   fullName: string;
@@ -36,6 +38,8 @@ export default function UserDetailsPage() {
     motherName: ''
   });
 
+  const router = useRouter(); // For routing
+
   const steps = [
     { id: 1, title: 'Personal Info', icon: FaUser },
     { id: 2, title: 'School Details', icon: FaSchool },
@@ -62,11 +66,10 @@ export default function UserDetailsPage() {
   const handleSubmit = async () => {
     setLoading(true);
     try {
-      // Get Firebase token from localStorage
       const firebaseToken = localStorage.getItem('firebaseToken');
       if (!firebaseToken) {
         alert('Authentication token not found. Please login again.');
-        window.location.href = '/phone';
+        router.push('/phone'); // Use router.push for navigation
         return;
       }
 
@@ -82,10 +85,9 @@ export default function UserDetailsPage() {
       const result = await response.json();
 
       if (result.success) {
-        // Store user data and redirect to dashboard
         localStorage.setItem('userProfile', JSON.stringify(result.user));
         alert('🎉 Profile completed successfully! Welcome to your learning journey!');
-        window.location.href = '/dashboard';
+        router.push('/dashboard'); // Use router.push for navigation
       } else {
         alert(result.error || 'Failed to save profile. Please try again.');
       }
@@ -124,9 +126,7 @@ export default function UserDetailsPage() {
 
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Full Name *
-                </label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Full Name *</label>
                 <input
                   type="text"
                   value={userDetails.fullName}
@@ -137,9 +137,7 @@ export default function UserDetailsPage() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Email Address *
-                </label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Email Address *</label>
                 <input
                   type="email"
                   value={userDetails.email}
@@ -150,9 +148,7 @@ export default function UserDetailsPage() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Date of Birth *
-                </label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Date of Birth *</label>
                 <input
                   type="date"
                   value={userDetails.dateOfBirth}
@@ -162,9 +158,7 @@ export default function UserDetailsPage() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Gender *
-                </label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Gender *</label>
                 <select
                   value={userDetails.gender}
                   onChange={(e) => handleInputChange('gender', e.target.value)}
@@ -190,9 +184,7 @@ export default function UserDetailsPage() {
 
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  School Name *
-                </label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">School Name *</label>
                 <input
                   type="text"
                   value={userDetails.schoolName}
@@ -203,9 +195,7 @@ export default function UserDetailsPage() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Class/Grade *
-                </label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Class/Grade *</label>
                 <select
                   value={userDetails.className}
                   onChange={(e) => handleInputChange('className', e.target.value)}
@@ -235,9 +225,7 @@ export default function UserDetailsPage() {
 
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Full Address *
-                </label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Full Address *</label>
                 <textarea
                   value={userDetails.address}
                   onChange={(e) => handleInputChange('address', e.target.value)}
@@ -248,9 +236,7 @@ export default function UserDetailsPage() {
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    City *
-                  </label>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">City *</label>
                   <input
                     type="text"
                     value={userDetails.city}
@@ -261,9 +247,7 @@ export default function UserDetailsPage() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    State *
-                  </label>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">State *</label>
                   <input
                     type="text"
                     value={userDetails.state}
@@ -275,9 +259,7 @@ export default function UserDetailsPage() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Pincode *
-                </label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Pincode *</label>
                 <input
                   type="text"
                   value={userDetails.pincode}
@@ -301,28 +283,24 @@ export default function UserDetailsPage() {
 
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Father's Name *
-                </label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Father&apos;s Name*</label>
                 <input
                   type="text"
                   value={userDetails.fatherName}
                   onChange={(e) => handleInputChange('fatherName', e.target.value)}
                   className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-4 focus:ring-blue-200 focus:border-blue-500 text-lg"
-                  placeholder="Enter father's name"
+                  placeholder="Enter father&apos;s name"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Mother's Name *
-                </label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Mother&apos;s Name *</label>
                 <input
                   type="text"
                   value={userDetails.motherName}
                   onChange={(e) => handleInputChange('motherName', e.target.value)}
                   className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-4 focus:ring-blue-200 focus:border-blue-500 text-lg"
-                  placeholder="Enter mother's name"
+                  placeholder="Enter mother&apos;s name"
                 />
               </div>
             </div>
@@ -339,12 +317,8 @@ export default function UserDetailsPage() {
       <div className="max-w-2xl mx-auto">
         {/* Header */}
         <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold text-gray-800 mb-2">
-            Complete Your Profile
-          </h1>
-          <p className="text-gray-600 text-lg">
-            Help us personalize your learning experience
-          </p>
+          <h1 className="text-4xl font-bold text-gray-800 mb-2">Complete Your Profile</h1>
+          <p className="text-gray-600 text-lg">Help us personalize your learning experience</p>
         </div>
 
         {/* Progress Steps */}
@@ -354,22 +328,26 @@ export default function UserDetailsPage() {
               const Icon = step.icon;
               const isCompleted = currentStep > step.id;
               const isCurrent = currentStep === step.id;
-              
+
               return (
                 <div key={step.id} className="flex items-center">
-                  <div className={`flex items-center justify-center w-12 h-12 rounded-full border-2 transition-all duration-300 ${
-                    isCompleted 
-                      ? 'bg-green-500 border-green-500 text-white' 
-                      : isCurrent 
-                        ? 'bg-blue-500 border-blue-500 text-white' 
+                  <div
+                    className={`flex items-center justify-center w-12 h-12 rounded-full border-2 transition-all duration-300 ${
+                      isCompleted
+                        ? 'bg-green-500 border-green-500 text-white'
+                        : isCurrent
+                        ? 'bg-blue-500 border-blue-500 text-white'
                         : 'bg-white border-gray-300 text-gray-400'
-                  }`}>
+                    }`}
+                  >
                     {isCompleted ? <FaCheck className="text-lg" /> : <Icon className="text-lg" />}
                   </div>
                   {index < steps.length - 1 && (
-                    <div className={`w-16 h-1 mx-2 transition-all duration-300 ${
-                      isCompleted ? 'bg-green-500' : 'bg-gray-300'
-                    }`} />
+                    <div
+                      className={`w-16 h-1 mx-2 transition-all duration-300 ${
+                        isCompleted ? 'bg-green-500' : 'bg-gray-300'
+                      }`}
+                    />
                   )}
                 </div>
               );

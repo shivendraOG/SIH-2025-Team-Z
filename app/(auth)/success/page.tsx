@@ -34,7 +34,7 @@ export default function SuccessPage() {
             🎉 OTP Verified Successfully!
           </h1>
           <p className="text-gray-600 text-lg">
-            Your phone number has been verified. Now let's complete your profile!
+            Your phone number has been verified. Now let&apos;s complete your profile!
           </p>
         </div>
 

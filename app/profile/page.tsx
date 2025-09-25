@@ -47,7 +47,7 @@ export default function ProfilePage() {
             avatarUrl: data.user.avatarUrl || "",
           })
         }
-      } catch (err) {
+      } catch {
         setError("Error fetching profile.")
       } finally {
         setLoading(false)
@@ -194,11 +194,11 @@ export default function ProfilePage() {
                   </div>
                   <div className="space-y-3">
                     <div>
-                      <p className="text-sm text-muted-foreground">Father's Name</p>
+                      <p className="text-sm text-muted-foreground">Father&apos;s Name</p>
                       <p className="font-medium text-foreground">{profile.fatherName || "-"}</p>
                     </div>
                     <div>
-                      <p className="text-sm text-muted-foreground">Mother's Name</p>
+                      <p className="text-sm text-muted-foreground">Mother&apos;s Name</p>
                       <p className="font-medium text-foreground">{profile.motherName || "-"}</p>
                     </div>
                   </div>

@@ -1,7 +1,7 @@
 // Simple local todo API for demo. For production, use a database.
 import { NextRequest, NextResponse } from "next/server";
 
-let todos: { id: number; text: string; done: boolean; userId: string }[] = [];
+const todos: { id: number; text: string; done: boolean; userId: string }[] = [];
 
 export async function GET(request: NextRequest) {
   const userId = request.nextUrl.searchParams.get("userId");

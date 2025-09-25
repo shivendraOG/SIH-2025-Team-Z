@@ -22,7 +22,7 @@ export default function ChatbotExplainer() {
       } else {
         setResponse(data.explanation);
       }
-    } catch (err) {
+    } catch {
       setError("Error connecting to server.");
     } finally {
       setLoading(false);

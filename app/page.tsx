@@ -158,7 +158,7 @@ export default function Home() {
               </div>
               <h3 className="text-2xl font-bold mb-4 text-yellow-300">Works Offline</h3>
               <p className="text-lg opacity-90 mb-6">
-                No internet? No problem! Download lessons and sync when you're back online.
+                No internet? No problem! Download lessons and sync when you&apos;re back online.
               </p>
               <div className="flex justify-center gap-2">
                 <FaWifi className="text-2xl text-cyan-300" />

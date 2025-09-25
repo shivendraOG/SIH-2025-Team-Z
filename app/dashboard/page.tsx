@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import {
@@ -42,13 +42,14 @@ import {
 // Extend Window type to include firebase
 declare global {
   interface Window {
-    firebase?: any;
+    firebase?: unknown;
   }
 }
 import booksDataRaw from "@/data/books.json";
 
 import TodoList from "@/components/TodoList";
 import { useContext } from "react";
+import Image from "next/image";
 // Assuming you will create this context in context/TodoContext.tsx
 import { TodoContext, TodoProvider } from "@/context/TodoContext";
 
@@ -256,8 +257,13 @@ function MathMiniGame({ onComplete }: { onComplete: (xp: number) => void }) {
 }
 
 // Word mini-game
+
+
 function WordMiniGame({ onComplete }: { onComplete: (xp: number) => void }) {
-  const words = ["earth", "river", "planet", "school", "puzzle", "science"];
+  const words = React.useMemo(
+    () => ["earth", "river", "planet", "school", "puzzle", "science"],
+    []
+  );
   const [word, setWord] = useState("");
   const [scrambled, setScrambled] = useState("");
   const [input, setInput] = useState("");
@@ -266,7 +272,7 @@ function WordMiniGame({ onComplete }: { onComplete: (xp: number) => void }) {
     const w = words[Math.floor(Math.random() * words.length)];
     setWord(w);
     setScrambled(shuffle(w));
-  }, []);
+  }, [words]); // <-- 'words' dependency added here
 
   function shuffle(s: string) {
     return s
@@ -334,7 +340,6 @@ function WordMiniGame({ onComplete }: { onComplete: (xp: number) => void }) {
     </Card>
   );
 }
-
 function capitalizeFullName(name: string) {
   return name
     .split(" ")
@@ -343,6 +348,8 @@ function capitalizeFullName(name: string) {
 }
 
 function DashboardContent() {
+  // Move useContext to top and use correct type
+  const { tasks } = useContext(TodoContext) || { tasks: [] };
   const [xp, setXp] = useState(850);
   const [greeting] = useState(getGreeting());
   const [profile, setProfile] = useState({
@@ -351,43 +358,21 @@ function DashboardContent() {
     dateOfBirth: "",
     schoolName: "",
   });
-  const [loadingProfile, setLoadingProfile] = useState(true);
-  const [profileError, setProfileError] = useState("");
+  const [profileError, setProfileError] = useState<string | null>(null);
+  const [loadingProfile, setLoadingProfile] = useState<boolean>(false);
   const [showMobileNav, setShowMobileNav] = useState(false);
-
-  useEffect(() => {
-    const token = localStorage.getItem("firebaseToken");
-    if (!token) {
-      window.location.href = "/";
-    }
-  }, []);
 
   useEffect(() => {
     async function fetchProfile() {
       setLoadingProfile(true);
-      setProfileError("");
+      setProfileError(null);
       try {
         const token = localStorage.getItem("firebaseToken");
-        if (!token) {
-          setProfileError("Not logged in. Please login.");
-          setProfile({
-            fullName: "Student",
-            className: "",
-            dateOfBirth: "",
-            schoolName: "",
-          });
-          setLoadingProfile(false);
-          return;
-        }
-
         const res = await fetch("/api/users/profile", {
-          method: "GET",
           headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
+            Authorization: token ? `Bearer ${token}` : "",
           },
         });
-
         const data = await res.json();
 
         if (!res.ok || !data.success || !data.user) {
@@ -428,9 +413,9 @@ function DashboardContent() {
       }
     }
     fetchProfile();
-  }, []);
+  }, [xp]);
 
-  const subjects = [
+  const subjects = React.useMemo(() => [
     {
       name: "Mathematics",
       progress: 75,
@@ -455,7 +440,7 @@ function DashboardContent() {
       lessons: 16,
       completed: 14,
     },
-  ];
+  ], []);
 
   const [fillWidths, setFillWidths] = useState(subjects.map(() => 0));
   useEffect(() => {
@@ -477,7 +462,7 @@ function DashboardContent() {
       timers.push(t);
     });
     return () => timers.forEach((t) => clearInterval(t));
-  }, []);
+  }, [subjects]);
 
   const handleLogout = async () => {
     localStorage.removeItem("firebaseToken");
@@ -581,9 +566,11 @@ function DashboardContent() {
                     className="relative h-8 w-8 rounded-full p-0"
                   >
                    
-                    <img
+                    <Image
                       src="/avatar.jpg"
                       alt="Profile"
+                      width={32}
+                      height={32}
                       className="w-8 h-8 rounded-full border-2 border-gray-200 hover:border-gray-300 transition-colors"
                     />
                   </Button>
@@ -914,22 +901,17 @@ function DashboardContent() {
               <CardHeader className="pb-4 sm:pb-6">
                 <CardTitle className="flex items-center gap-2 text-gray-900 text-lg sm:text-xl">
                   <CheckCircle className="h-4 w-4 sm:h-5 sm:w-5 text-green-600 flex-shrink-0" />
-                  Today's Tasks
+                  Today&apos;s Tasks
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-2 sm:space-y-3">
                 {/** Get tasks from TodoContext */}
-                {(() => {
-                  const { tasks } = useContext(TodoContext) || { tasks: [] };
-                  if (!tasks || tasks.length === 0) {
-                    return (
-                      <div className="text-gray-500 text-sm">
-                        No tasks for today! 🎉
-                      </div>
-                    );
-                  }
-                  return tasks.map((task: any, idx: number) => {
-                    // Color/icon logic based on task type or index
+                {tasks.length === 0 ? (
+                  <div className="text-gray-500 text-sm">
+                    No tasks for today! 🎉
+                  </div>
+                ) : (
+                  tasks.map((task: import("@/context/TodoContext").TodoTask, idx: number) => {
                     let bg = "bg-green-50 border-green-200 text-green-800";
                     let Icon = CheckCircle;
                     if (task.type === "reading" || idx % 3 === 1) {
@@ -945,21 +927,17 @@ function DashboardContent() {
                         className={`flex items-center gap-2 sm:gap-3 p-2 sm:p-3 rounded-lg border ${bg}`}
                       >
                         <Icon
-                          className={`h-4 w-4 sm:h-5 sm:w-5 flex-shrink-0 ${bg
-                            .split(" ")
-                            .pop()}`}
+                          className={`h-4 w-4 sm:h-5 sm:w-5 flex-shrink-0 ${bg.split(" ").pop()}`}
                         />
                         <span
-                          className={`text-xs sm:text-sm font-medium ${bg
-                            .split(" ")
-                            .pop()}`}
+                          className={`text-xs sm:text-sm font-medium ${bg.split(" ").pop()}`}
                         >
-                          {task.text || task.title}
+                          {task.text}
                         </span>
                       </div>
                     );
-                  });
-                })()}
+                  })
+                )}
               </CardContent>
             </Card>
 

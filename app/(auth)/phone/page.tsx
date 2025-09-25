@@ -127,10 +127,10 @@ export default function StudentLoginPage() {
       setResetTimer(60);
       setShowSuccess(true);
       setTimeout(() => setShowSuccess(false), 3000);
-    } catch (err: any) {
-      console.error("Firebase Phone Auth Error:", err);
-      setShake(true);
-      setTimeout(() => setShake(false), 500);
+  } catch (err: unknown) {
+  console.error("Firebase Phone Auth Error:", err);
+  setShake(true);
+  setTimeout(() => setShake(false), 500);
     } finally {
       setLoading(false);
     }
@@ -171,9 +171,10 @@ export default function StudentLoginPage() {
         setShake(true);
         setTimeout(() => setShake(false), 500);
       }
-    } catch (err: any) {
-      setShake(true);
-      setTimeout(() => setShake(false), 500);
+  } catch (err: unknown) {
+  console.error("Firebase Phone Auth Error:", err);
+  setShake(true);
+  setTimeout(() => setShake(false), 500);
     } finally {
       setLoading(false);
     }

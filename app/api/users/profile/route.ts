@@ -5,21 +5,29 @@ import {
   updateUserProfile,
 } from "@/lib/userService";
 
+interface VerifyTokenResult {
+  success: boolean;
+  data?: {
+    firebaseUid?: string;
+    [key: string]: unknown; // Changed 'any' to 'unknown'
+  };
+  message?: string;
+}
+
 // GET /api/users/profile
 export async function GET(request: NextRequest) {
   try {
     const authHeader = request.headers.get("authorization");
     if (!authHeader?.startsWith("Bearer ")) {
       return NextResponse.json(
-        { success: false, message: "No token provided" },
+        { success: false, message: "Missing or invalid authorization header" },
         { status: 401 }
       );
     }
 
     const token = authHeader.split(" ")[1];
+    const verifyResult = (await verifyTokenAndGetUser(token)) as VerifyTokenResult;
 
-    // Verify token and get user UID
-    const verifyResult = await verifyTokenAndGetUser(token);
     if (!verifyResult.success || !verifyResult.data?.firebaseUid) {
       return NextResponse.json(
         { success: false, message: "Invalid or expired token" },
@@ -27,7 +35,6 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    // Now fetch profile by UID
     const result = await getUserProfile(verifyResult.data.firebaseUid);
 
     if (!result.success) {
@@ -53,16 +60,14 @@ export async function PUT(request: NextRequest) {
     const authHeader = request.headers.get("authorization");
     if (!authHeader?.startsWith("Bearer ")) {
       return NextResponse.json(
-        { success: false, message: "No token provided" },
+        { success: false, message: "Missing or invalid authorization header" },
         { status: 401 }
       );
     }
 
     const token = authHeader.split(" ")[1];
-    const body = await request.json();
+    const verifyResult = (await verifyTokenAndGetUser(token)) as VerifyTokenResult;
 
-    // Verify Firebase token
-    const verifyResult = await verifyTokenAndGetUser(token);
     if (!verifyResult.success || !verifyResult.data?.firebaseUid) {
       return NextResponse.json(
         { success: false, message: "Invalid token" },
@@ -70,7 +75,7 @@ export async function PUT(request: NextRequest) {
       );
     }
 
-    // Update user profile in DB
+    const body = await request.json();
     const result = await updateUserProfile(verifyResult.data.firebaseUid, body);
 
     if (!result.success) {

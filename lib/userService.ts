@@ -23,9 +23,10 @@ interface ProfileData {
   pincode?: string;
   fatherName?: string;
   motherName?: string;
+  xp?: number;
 }
 
-interface ServiceResponse<T = any> {
+interface ServiceResponse<T = unknown> {
   success: boolean;
   message?: string;
   user?: T;
@@ -68,11 +69,11 @@ export async function createOrGetUser(
     await createUserSession(user.id, firebaseToken, decodedToken.exp);
 
     return { success: true, user };
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Error creating/getting user:", error);
     return {
       success: false,
-      message: error.message || "Failed to authenticate user",
+  message: typeof error === 'object' && error && 'message' in error ? (error as { message?: string }).message || "Failed to authenticate user" : "Failed to authenticate user",
     };
   }
 }
@@ -153,11 +154,11 @@ export async function updateUserProfile(
       message: "Profile updated successfully",
       user: updatedUser,
     };
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Error updating user profile:", error);
     return {
       success: false,
-      message: error.message || "Failed to update profile",
+  message: typeof error === 'object' && error && 'message' in error ? (error as { message?: string }).message || "Failed to update profile" : "Failed to update profile",
     };
   }
 }
@@ -170,11 +171,11 @@ export async function getUserProfile(
     const user = await prisma.user.findUnique({ where: { firebaseUid } });
     if (!user) return { success: false, message: "User not found" };
     return { success: true, user };
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Error getting user profile:", error);
     return {
       success: false,
-      message: error.message || "Failed to get user profile",
+  message: typeof error === 'object' && error && 'message' in error ? (error as { message?: string }).message || "Failed to get user profile" : "Failed to get user profile",
     };
   }
 }
@@ -200,7 +201,7 @@ export async function verifyTokenAndGetUser(
       user: result.user,
       data: { firebaseUid: decodedToken.uid },
     };
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Error verifying token:", error);
     return { success: false, message: "Invalid or expired token" };
   }
@@ -214,9 +215,9 @@ export async function logout(firebaseToken: string): Promise<ServiceResponse> {
       data: { isActive: false },
     });
     return { success: true, message: "Logged out successfully" };
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Error logging out user:", error);
-    return { success: false, message: error.message || "Failed to logout" };
+  return { success: false, message: typeof error === 'object' && error && 'message' in error ? (error as { message?: string }).message || "Failed to logout" : "Failed to logout" };
   }
 }
 
@@ -228,11 +229,11 @@ export async function deleteUser(
     await admin.auth().deleteUser(firebaseUid);
     await prisma.user.delete({ where: { firebaseUid } });
     return { success: true, message: "Account deleted successfully" };
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Error deleting user:", error);
     return {
       success: false,
-      message: error.message || "Failed to delete account",
+  message: typeof error === 'object' && error && 'message' in error ? (error as { message?: string }).message || "Failed to delete account" : "Failed to delete account",
     };
   }
 }

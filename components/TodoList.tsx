@@ -1,7 +1,7 @@
 "use client"
 
 import type React from "react"
-import { useEffect, useRef, useState, useContext } from "react"
+import { useRef, useState, useContext } from "react"
 import {
   Card,
   CardContent,
@@ -13,7 +13,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
 import { Checkbox } from "@/components/ui/checkbox"
-import { Alert, AlertDescription } from "@/components/ui/alert"
+// ...existing code...
 import { TodoContext } from "@/context/TodoContext"
 import { Plus, Trash2 } from "lucide-react"
 import clsx from "clsx" // or 'classnames' or your own 'cn' utility
